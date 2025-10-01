@@ -85,7 +85,7 @@ WSGI_APPLICATION = 'mi_proyecto.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'FastFood',   # nombre de la base en Postgres
+        'NAME': 'fastfood',   # nombre de la base en Postgres
         'USER': 'postgres',       # tu usuario de postgres
         'PASSWORD': '1203',  # la clave que usaste al instalar postgres
         'HOST': 'localhost',      # o 127.0.0.1
