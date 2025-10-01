@@ -84,8 +84,12 @@ WSGI_APPLICATION = 'mi_proyecto.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'FastFood',   # nombre de la base en Postgres
+        'USER': 'postgres',       # tu usuario de postgres
+        'PASSWORD': '1203',  # la clave que usaste al instalar postgres
+        'HOST': 'localhost',      # o 127.0.0.1
+        'PORT': '5432',           # puerto por defecto de postgres
     }
 }
 
@@ -132,7 +136,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'usuarios.CustomUser'
 CORS_ALLOW_ALL_ORIGINS = True   # Solo en desarrollo
-INSTALLED_APPS += ["corsheaders"]
+INSTALLED_APPS += []
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
