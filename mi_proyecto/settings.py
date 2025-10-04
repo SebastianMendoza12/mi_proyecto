@@ -84,8 +84,12 @@ WSGI_APPLICATION = 'mi_proyecto.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'fastfood',         # tu base de datos
+        'USER': 'postgres',         # tu usuario de postgres
+        'PASSWORD': '1203', # la clave
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
