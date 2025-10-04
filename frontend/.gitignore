@@ -22,3 +22,23 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# --- Archivos de entorno ---
+.env
+.env.local
+.env.*.local
+
+# --- Archivos de compilación ---
+build/
+coverage/
+
+# --- Python / Django ---
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
