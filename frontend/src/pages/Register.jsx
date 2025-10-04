@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import { registerUser } from "../services/api";
 
 export default function Register() {
   const [username, setUsername] = useState("");
@@ -7,15 +7,8 @@ export default function Register() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-
     try {
-      const backendUrl = "https://fastfood-fapu.onrender.com";
-
-      const res = await axios.post(`${backendUrl}/api/auth/register/`, {
-        username,
-        password,
-      });
-
+      await registerUser({ username, password });
       alert("Usuario registrado correctamente");
     } catch (err) {
       if (err.response) {
@@ -29,21 +22,18 @@ export default function Register() {
   return (
     <form onSubmit={handleRegister}>
       <h2>Registro</h2>
-
       <input
         type="text"
         placeholder="Usuario"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
       />
-
       <input
         type="password"
         placeholder="Contraseña"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-
       <button type="submit">Registrar</button>
     </form>
   );
