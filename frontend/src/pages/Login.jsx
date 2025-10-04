@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import { loginUser } from "../services/api"; 
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -8,19 +8,27 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://127.0.0.1:8000/api/auth/login/", {
-        username,
-        password,
-      });
-      localStorage.setItem("token", res.data.access);
-      alert("Login exitoso!");
+      const res = await loginUser({ username, password });
+      localStorage.setItem("access_token", res.data.access);
+      alert("¡Login exitoso!");
     } catch (err) {
-      alert("Credenciales inválidas");
+      console.error(err);
+      alert("Credenciales inválidas o error en el servidor");
     }
   };
 
   return (
-    <form onSubmit={handleLogin}>
+    <form
+      onSubmit={handleLogin}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px",
+        width: "250px",
+        margin: "auto",
+        marginTop: "50px",
+      }}
+    >
       <h2>Login</h2>
       <input
         type="text"
