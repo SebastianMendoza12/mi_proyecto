@@ -58,11 +58,11 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
 ]
 
-#CORS_ALLOWED_ORIGINS = [
-#    "http://localhost:5173"
-#]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "https://tu-frontend-en-vercel.vercel.app",
+]
 
-CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'mi_proyecto.urls'
 
