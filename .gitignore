@@ -1,0 +1,25 @@
+# --- Python / Django ---
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+
+# --- Archivos de configuración ---
+.env
+*.env
+*.log
+
+# --- Node / React ---
+node_modules/
+dist/
+build/
+
+# --- IDEs / Editores ---
+.vscode/
+.idea/
+*.iml
