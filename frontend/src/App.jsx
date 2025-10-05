@@ -6,27 +6,27 @@ function Navbar() {
   const location = useLocation();
 
   return (
-    <nav className="flex justify-center gap-4 mb-6">
+    <nav className="flex justify-center gap-4 mb-8 w-full">
       <Link
         to="/login"
-        className={`px-4 py-2 rounded-md font-medium ${
+        className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
           location.pathname === "/login"
-            ? "bg-blue-600 text-white cursor-default"
-            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            ? "bg-blue-600 text-white shadow-md"
+            : "bg-gray-200 text-gray-700 hover:bg-gray-300 hover:shadow-sm"
         }`}
       >
-        Login
+        Iniciar Sesión
       </Link>
 
       <Link
         to="/register"
-        className={`px-4 py-2 rounded-md font-medium ${
+        className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
           location.pathname === "/register"
-            ? "bg-blue-600 text-white cursor-default"
-            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            ? "bg-blue-600 text-white shadow-md"
+            : "bg-gray-200 text-gray-700 hover:bg-gray-300 hover:shadow-sm"
         }`}
       >
-        Registro
+        Registrarse
       </Link>
     </nav>
   );
@@ -36,8 +36,8 @@ function App() {
   return (
     <Router>
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4">
-        <h1 className="text-3xl font-bold mb-8">🍔 FastFood</h1>
-        <div className="w-full max-w-sm bg-white shadow-lg rounded-2xl p-6">
+        <h1 className="text-4xl font-bold mb-8 text-gray-800">🍔 FastFood</h1>
+        <div className="w-full max-w-md bg-white shadow-xl rounded-2xl p-8">
           <Navbar />
           <Routes>
             <Route path="/" element={<Login />} />
