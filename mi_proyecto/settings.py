@@ -61,7 +61,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "https://tu-frontend-en-vercel.vercel.app",
+    "https://mi-proyecto-amber-delta.vercel.app/",
 ]
 
 
