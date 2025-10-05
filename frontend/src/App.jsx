@@ -5,36 +5,26 @@ import Register from "./pages/Register";
 function Navbar() {
   const location = useLocation();
 
-  const isLogin = location.pathname === "/login" || location.pathname === "/";
-  const isRegister = location.pathname === "/register";
-
   return (
-    <nav style={{ marginBottom: "25px", display: "flex", gap: "10px" }}>
+    <nav className="flex justify-center gap-4 mb-6">
       <Link
         to="/login"
-        style={{
-          pointerEvents: isLogin ? "none" : "auto",
-          backgroundColor: isLogin ? "#6c757d" : "#007bff",
-          color: "white",
-          padding: "10px 20px",
-          borderRadius: "6px",
-          textDecoration: "none",
-          opacity: isLogin ? 0.7 : 1,
-        }}
+        className={`px-4 py-2 rounded-md font-medium ${
+          location.pathname === "/login"
+            ? "bg-blue-600 text-white cursor-default"
+            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+        }`}
       >
         Login
       </Link>
+
       <Link
         to="/register"
-        style={{
-          pointerEvents: isRegister ? "none" : "auto",
-          backgroundColor: isRegister ? "#6c757d" : "#007bff",
-          color: "white",
-          padding: "10px 20px",
-          borderRadius: "6px",
-          textDecoration: "none",
-          opacity: isRegister ? 0.7 : 1,
-        }}
+        className={`px-4 py-2 rounded-md font-medium ${
+          location.pathname === "/register"
+            ? "bg-blue-600 text-white cursor-default"
+            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+        }`}
       >
         Registro
       </Link>
@@ -45,29 +35,10 @@ function Navbar() {
 function App() {
   return (
     <Router>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "100vh",
-          background: "linear-gradient(135deg, #f5f7fa, #c3cfe2)",
-          padding: "20px",
-        }}
-      >
-        <h1 style={{ marginBottom: "20px", color: "#333" }}>🍔 FastFood</h1>
-        <Navbar />
-        <div
-          style={{
-            background: "#fff",
-            padding: "40px 30px",
-            borderRadius: "12px",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-            width: "100%",
-            maxWidth: "350px",
-          }}
-        >
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4">
+        <h1 className="text-3xl font-bold mb-8">🍔 FastFood</h1>
+        <div className="w-full max-w-sm bg-white shadow-lg rounded-2xl p-6">
+          <Navbar />
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/login" element={<Login />} />

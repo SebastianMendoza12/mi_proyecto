@@ -4,92 +4,78 @@ import axios from "axios";
 function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
+  const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async (e) => {
     e.preventDefault();
-
-    if (password !== confirm) {
-      alert("⚠️ Las contraseñas no coinciden");
-      return;
-    }
-
+    setMessage(null);
     setLoading(true);
+
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/register/`,
+        `${import.meta.env.VITE_API_URL}/register/`,
         { username, password }
       );
-      alert("✅ Registro exitoso");
-      console.log(res.data);
+      setMessage({ text: "✅ Usuario creado exitosamente", type: "success" });
+      setUsername("");
+      setPassword("");
     } catch (err) {
-      alert("❌ Error al registrar (usuario ya existe o servidor caído)");
+      setMessage({
+        text:
+          err.response?.data?.error ||
+          err.response?.data?.detail ||
+          "❌ Error al registrar usuario",
+        type: "error",
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form
-      onSubmit={handleRegister}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
-      <h2 style={{ marginBottom: "20px", color: "#333" }}>Crear cuenta</h2>
+    <form onSubmit={handleRegister} className="flex flex-col items-center">
+      <h2 className="text-xl font-semibold mb-4">Registro</h2>
 
       <input
         type="text"
         placeholder="Usuario"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
-        style={inputStyle}
         required
+        className="w-full p-2 mb-3 border border-gray-300 rounded-md"
       />
+
       <input
         type="password"
         placeholder="Contraseña"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        style={inputStyle}
         required
+        className="w-full p-2 mb-3 border border-gray-300 rounded-md"
       />
-      <input
-        type="password"
-        placeholder="Confirmar contraseña"
-        value={confirm}
-        onChange={(e) => setConfirm(e.target.value)}
-        style={inputStyle}
-        required
-      />
-      <button type="submit" style={buttonStyle} disabled={loading}>
-        {loading ? "Creando cuenta..." : "Registrarse"}
+
+      <button
+        type="submit"
+        disabled={loading}
+        className={`w-full p-2 rounded-md text-white ${
+          loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
+        }`}
+      >
+        {loading ? "Cargando..." : "Registrarse"}
       </button>
+
+      {message && (
+        <p
+          className={`mt-3 text-sm ${
+            message.type === "error" ? "text-red-600" : "text-green-600"
+          }`}
+        >
+          {message.text}
+        </p>
+      )}
     </form>
   );
 }
-
-const inputStyle = {
-  width: "100%",
-  padding: "10px",
-  marginBottom: "12px",
-  borderRadius: "6px",
-  border: "1px solid #ccc",
-  fontSize: "14px",
-};
-
-const buttonStyle = {
-  width: "100%",
-  backgroundColor: "#28a745",
-  color: "white",
-  border: "none",
-  padding: "10px",
-  borderRadius: "6px",
-  cursor: "pointer",
-  fontSize: "15px",
-};
 
 export default Register;
