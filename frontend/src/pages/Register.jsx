@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { registerUser } from "../services/api";
 
-
 function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -14,8 +13,7 @@ function Register() {
     setLoading(true);
 
     try {
-      const res = await registerUser({ username, password });
-
+      await registerUser({ username, password });
       setMessage({ text: "✅ Usuario creado exitosamente", type: "success" });
       setUsername("");
       setPassword("");
@@ -33,47 +31,56 @@ function Register() {
   };
 
   return (
-    <form onSubmit={handleRegister} className="flex flex-col items-center">
-      <h2 className="text-xl font-semibold mb-4">Registro</h2>
-
-      <input
-        type="text"
-        placeholder="Usuario"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        required
-        className="w-full p-2 mb-3 border border-gray-300 rounded-md"
-      />
-
-      <input
-        type="password"
-        placeholder="Contraseña"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-        className="w-full p-2 mb-3 border border-gray-300 rounded-md"
-      />
-
-      <button
-        type="submit"
-        disabled={loading}
-        className={`w-full p-2 rounded-md text-white ${
-          loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
-        }`}
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <form
+        onSubmit={handleRegister}
+        className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md flex flex-col items-center"
       >
-        {loading ? "Cargando..." : "Registrarse"}
-      </button>
+        <h2 className="text-2xl font-semibold mb-6 text-gray-800">
+          Registro de Usuario
+        </h2>
 
-      {message && (
-        <p
-          className={`mt-3 text-sm ${
-            message.type === "error" ? "text-red-600" : "text-green-600"
+        <input
+          type="text"
+          placeholder="Usuario"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+          className="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+        <input
+          type="password"
+          placeholder="Contraseña"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          className="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+        <button
+          type="submit"
+          disabled={loading}
+          className={`w-full p-3 rounded-lg text-white font-semibold transition ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
           }`}
         >
-          {message.text}
-        </p>
-      )}
-    </form>
+          {loading ? "Cargando..." : "Registrarse"}
+        </button>
+
+        {message && (
+          <p
+            className={`mt-4 text-sm ${
+              message.type === "error" ? "text-red-600" : "text-green-600"
+            }`}
+          >
+            {message.text}
+          </p>
+        )}
+      </form>
+    </div>
   );
 }
 
