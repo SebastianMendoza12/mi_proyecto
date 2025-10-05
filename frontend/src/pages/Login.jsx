@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import { loginUser } from "../services/api";
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -13,10 +13,8 @@ function Login() {
     setLoading(true);
 
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/login/`,
-        { username, password }
-      );
+      const res = await loginUser({ username, password });
+
       setMessage({ text: "✅ Inicio de sesión exitoso", type: "success" });
       console.log("Token:", res.data);
     } catch (err) {

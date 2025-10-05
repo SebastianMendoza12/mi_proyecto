@@ -1,5 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
+import { registerUser } from "../services/api";
+
 
 function Register() {
   const [username, setUsername] = useState("");
@@ -13,10 +14,8 @@ function Register() {
     setLoading(true);
 
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/auth/register/`,
-        { username, password }
-      );
+      const res = await registerUser({ username, password });
+
       setMessage({ text: "✅ Usuario creado exitosamente", type: "success" });
       setUsername("");
       setPassword("");
