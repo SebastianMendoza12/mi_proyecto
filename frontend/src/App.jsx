@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom";
+import Home from "./pages/Home";  // Importé Home para la landing page
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
@@ -35,16 +36,23 @@ function Navbar() {
 function App() {
   return (
     <Router>
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-2 sm:px-4 lg:px-8 w-full">  {/* px responsive: pequeño en móvil, grande en PC */}
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 sm:mb-8 text-gray-800">🍔 FastFood</h1>  {/* Tamaño de fuente responsive */}
-        <div className="w-full max-w-sm sm:max-w-md lg:max-w-lg bg-white shadow-xl rounded-2xl p-6 sm:p-8">  {/* Ancho y padding responsive */}
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-          </Routes>
-        </div>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-2 sm:px-4 lg:px-8 w-full">
+        <Routes>
+          <Route 
+            path="/" 
+            element={
+              <div className="w-full text-center">  {/* Landing: Solo título y navbar */}
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 sm:mb-8 text-gray-800">🍔 FastFood</h1>
+                <div className="w-full max-w-sm sm:max-w-md lg:max-w-lg bg-white shadow-xl rounded-2xl p-6 sm:p-8">
+                  <Navbar />
+                  <p className="text-gray-600 text-sm sm:text-base mt-4">Bienvenido a FastFood. Elige una opción para comenzar.</p>  {/* Mensaje simple de bienvenida */}
+                </div>
+              </div>
+            } 
+          />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+        </Routes>
       </div>
     </Router>
   );
