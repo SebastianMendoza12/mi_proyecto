@@ -139,7 +139,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'usuarios.CustomUser'
-CORS_ALLOW_ALL_ORIGINS = True   # Solo en desarrollo
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "https://tu-frontend-en-vercel.vercel.app"
+]
+   # Solo en desarrollo
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
