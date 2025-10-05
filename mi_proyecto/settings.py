@@ -46,22 +46,21 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "whitenoise.middleware.WhiteNoiseMiddleware",
-
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware", 
     "django.middleware.common.CommonMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+
 ]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "https://mi-proyecto-amber-delta.vercel.app/",
+    "https://mi-proyecto-amber-delta.vercel.app",
 ]
 
 
@@ -139,11 +138,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'usuarios.CustomUser'
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "https://tu-frontend-en-vercel.vercel.app"
-]
-   # Solo en desarrollo
+
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
