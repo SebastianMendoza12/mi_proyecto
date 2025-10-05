@@ -7,7 +7,7 @@ function Navbar() {
 
   return (
     <div className="flex flex-col items-center bg-white shadow-lg rounded-xl p-4 sm:p-6 mb-6 w-full max-w-sm sm:max-w-md lg:max-w-lg mx-auto">  {/* Caja global para título y botones: siempre arriba */}
-      <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 text-gray-800">🍔 FastFood</h1>  {/* Título siempre visible */}
+      <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 text-gray-800">🍔 FastFood.exe</h1>  {/* Título siempre visible */}
       
       <nav className="flex flex-col sm:flex-row justify-center gap-4 w-full">  {/* Botones en caja, responsive */}
         <Link
