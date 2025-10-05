@@ -40,7 +40,7 @@ function Welcome() {
   return (
     <div className="w-full max-w-sm sm:max-w-md lg:max-w-lg mx-auto text-center bg-white shadow-xl rounded-2xl p-6 sm:p-8">
       <p className="text-gray-600 text-sm sm:text-base">
-        Bienvenido a FastFood. Elige una opción para comenzar tu experiencia.
+        Bienvenido a FastFood.exe. Elige una opción para comenzar tu experiencia.
       </p>
     </div>
   );
