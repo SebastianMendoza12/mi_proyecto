@@ -5,6 +5,12 @@ import Register from "./pages/Register";
 function Navbar() {
   const location = useLocation();
 
+  // 🔥 RUTAS SIN NAVBAR (pantalla completa lado a lado)
+  const noNavbarRoutes = ["/login", "/register", "/2fa"];
+  if (noNavbarRoutes.includes(location.pathname)) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col items-center bg-white shadow-lg rounded-xl p-4 sm:p-6 mb-6 w-full max-w-sm sm:max-w-md lg:max-w-lg mx-auto">  {/* Caja global para título y botones: siempre arriba */}
       <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 text-gray-800">🍔 FastFood.exe</h1>  {/* Título siempre visible */}
@@ -47,17 +53,30 @@ function Welcome() {
 }
 
 function App() {
+  const location = useLocation();
+  
+  // 🔥 RUTAS CON DISEÑO ESPECIAL (pantalla completa, sin contenedores)
+  const fullScreenRoutes = ["/login", "/register", "/2fa"];
+  const isFullScreenPage = fullScreenRoutes.includes(location.pathname);
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-2 sm:px-4 lg:px-8 w-full">
+      <Navbar />  {/* Navbar GLOBAL: Siempre arriba, con título y botones */}
+        
+      <Routes>  {/* Contenido que cambia debajo del navbar */}
+        <Route path="/" element={<Welcome />} />  {/* Home: Solo mensaje de bienvenida, SIN casillas */}
+        <Route path="/login" element={<Login />} />  {/* Login: Formulario debajo */}
+        <Route path="/register" element={<Register />} />  {/* Register: Formulario debajo */}
+      </Routes>
+    </div>
+  );
+}
+
+// Wrapper para que useLocation funcione
+function AppWrapper() {
   return (
     <Router>
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-2 sm:px-4 lg:px-8 w-full">
-        <Navbar />  {/* Navbar GLOBAL: Siempre arriba, con título y botones */}
-        
-        <Routes>  {/* Contenido que cambia debajo del navbar */}
-          <Route path="/" element={<Welcome />} />  {/* Home: Solo mensaje de bienvenida, SIN casillas */}
-          <Route path="/login" element={<Login />} />  {/* Login: Formulario debajo */}
-          <Route path="/register" element={<Register />} />  {/* Register: Formulario debajo */}
-        </Routes>
-      </div>
+      <App />
     </Router>
   );
 }
