@@ -17,10 +17,6 @@
 
 /* Media queries para ajustes finos */
 @media (max-width: 768px) {
-  #root {
-    padding: 1rem;  /* Padding extra en móvil para respiración */
-  }
-  
   .card {
     padding: 1.5em;  /* Tarjetas más compactas en móvil */
   }
