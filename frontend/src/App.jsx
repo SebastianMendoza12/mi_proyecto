@@ -52,7 +52,7 @@ function Welcome() {
   );
 }
 
-function App() {
+function AppContent() {
   const location = useLocation();
   
   // 🔥 RUTAS CON DISEÑO ESPECIAL (pantalla completa, sin contenedores)
@@ -72,11 +72,11 @@ function App() {
   );
 }
 
-// Wrapper para que useLocation funcione
-function AppWrapper() {
+// Componente principal que envuelve con Router
+function App() {
   return (
     <Router>
-      <App />
+      <AppContent />
     </Router>
   );
 }
