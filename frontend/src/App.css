@@ -1,23 +1,14 @@
-#root {
-  margin: 0 auto;
-  padding: 0;  /* Sin padding fijo; usa clases responsive en app.jsx */
-  text-align: center;
-  width: 100%;
-  height: 100%;
+body {
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  background-color: #f9fafb; /* fondo gris claro */
+  margin: 0;
+  padding: 0;
 }
 
-/* Responsive para tarjetas y elementos */
-.card {
-  padding: 2em;
+h1, h2, h3, h4, h5 {
+  color: #111827;
 }
 
-.read-the-docs {
-  color: #888;
-}
-
-/* Media queries para ajustes finos */
-@media (max-width: 768px) {
-  .card {
-    padding: 1.5em;  /* Tarjetas más compactas en móvil */
-  }
+button {
+  transition: all 0.2s ease-in-out;
 }
