@@ -51,12 +51,6 @@ function Login() {
               alt="Logo FastFood"
               className="w-full max-w-md mx-auto mb-8 drop-shadow-2xl"
             />
-            <h2 className="text-white text-3xl font-bold mb-4">
-              Bienvenido a FastFood.exe
-            </h2>
-            <p className="text-indigo-100 text-lg">
-              La mejor experiencia de pedidos en línea
-            </p>
           </div>
         </div>
 
