@@ -40,71 +40,82 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row">
-      {/* LADO IZQUIERDO */}
-      <div className="hidden md:flex md:w-1/2 bg-[#FFFBD2] items-center justify-center">
-        <img
-          src={logo}
-          alt="Logo FastFood.exe"
-          className="w-72 h-auto object-contain"
-        />
+    <div className="min-h-screen flex flex-col md:flex-row bg-white">
+      {/* LADO IZQUIERDO - FONDO AMARILLO CON LOGO */}
+      <div className="hidden md:flex md:w-1/2 bg-[#FFFBD2] items-center justify-center relative">
+        <div className="text-center">
+          <img
+            src={logo}
+            alt="Logo FastFood.exe"
+            className="w-72 h-auto object-contain mx-auto mb-4"
+          />
+          <div className="text-black font-bold text-2xl mt-4">
+            FASTFOOD.EXE
+          </div>
+        </div>
       </div>
 
-      {/* LADO DERECHO */}
+      {/* LADO DERECHO - FORMULARIO DE LOGIN */}
       <div className="flex w-full md:w-1/2 items-center justify-center bg-white">
         <div className="w-full max-w-md px-8 py-10">
-          <h2 className="text-3xl font-extrabold text-black text-center mb-10">
+          <h2 className="text-3xl font-extrabold text-black text-center mb-8">
             INICIAR SESIÓN
           </h2>
 
           <form
             onSubmit={handleLogin}
-            className="flex flex-col items-center space-y-6"
+            className="flex flex-col space-y-6"
           >
-            <input
-              type="text"
-              placeholder="Usuario"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FFFBD2]"
-            />
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Usuario</label>
+              <input
+                type="text"
+                placeholder="Ingresa tu usuario"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FFFBD2] focus:border-[#FFFBD2]"
+              />
+            </div>
 
-            <input
-              type="password"
-              placeholder="Contraseña"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FFFBD2]"
-            />
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Contraseña</label>
+              <input
+                type="password"
+                placeholder="Ingresa tu contraseña"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FFFBD2] focus:border-[#FFFBD2]"
+              />
+            </div>
 
             <button
               type="submit"
               disabled={loading}
               className={`w-full p-3 rounded-md font-semibold transition-all duration-200 ${
                 loading
-                  ? "bg-gray-300 cursor-not-allowed"
-                  : "bg-[#FFFBD2] hover:bg-[#FFF9AA] text-black border border-gray-400"
+                  ? "bg-gray-300 cursor-not-allowed text-gray-500"
+                  : "bg-[#FFFBD2] hover:bg-[#FFF9AA] text-black border border-gray-300 shadow-sm"
               }`}
             >
               {loading ? "Cargando..." : "Continuar"}
             </button>
 
-            <p className="text-sm text-gray-700 hover:underline cursor-pointer">
+            <p className="text-sm text-gray-600 hover:text-gray-800 hover:underline cursor-pointer text-center mt-4">
               ¿Has olvidado la contraseña?
             </p>
 
             {message && (
-              <p
-                className={`text-sm font-medium text-center px-4 py-2 rounded-lg w-full ${
+              <div
+                className={`p-3 rounded-lg text-center ${
                   message.type === "error"
-                    ? "bg-red-100 text-red-700 border border-red-300"
-                    : "bg-green-100 text-green-700 border border-green-300"
+                    ? "bg-red-50 text-red-700 border border-red-200"
+                    : "bg-green-50 text-green-700 border border-green-200"
                 }`}
               >
                 {message.text}
-              </p>
+              </div>
             )}
           </form>
         </div>
