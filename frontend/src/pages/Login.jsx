@@ -73,7 +73,7 @@ function Login() {
 
     </div>
   </div>
-);
+  );
 
 }
 
