@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { loginUser  } from "../services/api";
-import AuthLayout from "../components/AuthLayout";
+import logo from "../assets/LogotipoProyecto.png";
 
 function Login() {
   const [username, setUsername] = useState("");
