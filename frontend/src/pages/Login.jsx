@@ -40,72 +40,70 @@ function Login() {
   };
 
   return (
-  <div className="flex flex-col lg:flex-row w-full min-h-screen bg-gray-100">
-    {/* LADO IZQUIERDO - LOGO */}
+  <div className="flex flex-col lg:flex-row w-full h-screen bg-gray-100">
+    {/* Sección Izquierda (Logo) */}
     <div className="lg:w-1/2 w-full flex justify-center items-center bg-white">
       <img
         src={logo}
         alt="Logo FastFood.exe"
-        className="object-contain w-[80%] max-w-[600px] h-auto"
+        className="max-w-full h-auto object-contain p-8"
       />
     </div>
 
-    {/* LADO DERECHO - FORMULARIO */}
-    <div className="lg:w-1/2 w-full flex justify-center items-center bg-white p-8">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
-        <h2 className="text-3xl font-bold text-center mb-8 text-gray-800">
-          Iniciar Sesión
-        </h2>
+    {/* Sección Derecha (Formulario) */}
+    <div className="lg:w-1/2 w-full flex justify-center items-center bg-white shadow-inner">
+      <form
+        onSubmit={handleLogin}
+        className="w-full max-w-sm sm:max-w-md lg:max-w-lg mx-auto flex flex-col items-center space-y-6 p-6 sm:p-8"
+      >
+        <h2 className="text-3xl font-bold mb-6 text-gray-800">Iniciar Sesión</h2>
 
-        <form onSubmit={handleLogin} className="flex flex-col space-y-6">
-          <input
-            type="text"
-            placeholder="Usuario"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            className="p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-          />
+        <input
+          type="text"
+          placeholder="Usuario"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+          className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+        />
 
-          <input
-            type="password"
-            placeholder="Contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-          />
+        <input
+          type="password"
+          placeholder="Contraseña"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+        />
 
-          <button
-            type="submit"
-            disabled={loading}
-            className={`p-4 rounded-xl text-white font-semibold transition-transform duration-200 transform hover:scale-105 ${
-              loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 shadow-md"
+        <button
+          type="submit"
+          disabled={loading}
+          className={`w-full p-4 rounded-xl text-white font-semibold transition-all duration-200 transform hover:scale-105 ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700 shadow-md"
+          }`}
+        >
+          {loading ? "⏳ Cargando..." : "🚀 Entrar"}
+        </button>
+
+        <p className="text-sm text-gray-600 mt-2 hover:text-blue-500 cursor-pointer">
+          ¿Olvidaste tu contraseña?
+        </p>
+
+        {message && (
+          <p
+            className={`text-sm font-medium text-center px-4 py-2 rounded-lg w-full ${
+              message.type === "error"
+                ? "bg-red-100 text-red-700 border border-red-300"
+                : "bg-green-100 text-green-700 border border-green-300"
             }`}
           >
-            {loading ? "⏳ Cargando..." : "🚀 Entrar"}
-          </button>
-
-          {/* Olvidaste tu contraseña */}
-          <p className="text-sm text-center text-gray-500 hover:text-blue-600 cursor-pointer transition">
-            ¿Olvidaste tu contraseña?
+            {message.text}
           </p>
-
-          {message && (
-            <p
-              className={`text-sm font-medium text-center px-4 py-2 rounded-lg ${
-                message.type === "error"
-                  ? "bg-red-100 text-red-700 border border-red-300"
-                  : "bg-green-100 text-green-700 border border-green-300"
-              }`}
-            >
-              {message.text}
-            </p>
-          )}
-        </form>
-      </div>
+        )}
+      </form>
     </div>
   </div>
 );
