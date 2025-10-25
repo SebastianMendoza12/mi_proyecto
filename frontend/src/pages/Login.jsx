@@ -40,74 +40,120 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen flex">
-      {/* Lado izquierdo - Logo */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-yellow-100 to-yellow-200 items-center justify-center p-12">
+    <div className="flex flex-col lg:flex-row min-h-screen">
+      {/* ===== LADO IZQUIERDO - LOGO ===== */}
+      {/* 📱 En móvil: arriba | 💻 En desktop: izquierda (48.75%) */}
+      <div 
+        className="w-full lg:w-[48.75%] flex items-center justify-center py-8 lg:py-0"
+        style={{ backgroundColor: '#FFF9E6' }} // 🎨 CAMBIAR COLOR DE FONDO AQUÍ
+      >
         <img 
           src={logo} 
           alt="FastFood.exe Logo" 
-          className="max-w-md w-full h-auto object-contain"
+          className="w-3/4 max-w-sm lg:w-full lg:max-w-none lg:h-full object-contain p-4 lg:p-8"
         />
       </div>
 
-      {/* Lado derecho - Formulario */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 bg-white">
-        <div className="w-full max-w-md">
-          {/* Logo para móvil */}
-          <div className="lg:hidden flex justify-center mb-8">
-            <img 
-              src={logo} 
-              alt="FastFood.exe Logo" 
-              className="w-48 h-auto object-contain"
-            />
-          </div>
+      {/* ===== LADO DERECHO - FORMULARIO ===== */}
+      {/* 📱 En móvil: abajo | 💻 En desktop: derecha (51.25%) */}
+      <div 
+        className="w-full lg:w-[51.25%] flex items-center justify-center p-6 sm:p-8 lg:p-12"
+        style={{ backgroundColor: '#FFFFFF' }} // 🎨 CAMBIAR COLOR DE FONDO AQUÍ
+      >
+        <div className="w-full max-w-md space-y-6 sm:space-y-8">
+          
+          {/* ===== TÍTULO ===== */}
+          <h2 
+            className="text-center font-bold mb-8 sm:mb-12"
+            style={{ 
+              fontSize: 'clamp(32px, 5vw, 48px)', // 📱 32px móvil → 💻 48px desktop (se adapta automáticamente)
+              fontFamily: 'Arial, sans-serif',
+              color: '#000000',
+              letterSpacing: '2px'
+            }}
+          >
+            INICIAR SESIÓN
+          </h2>
 
-          <form onSubmit={handleLogin} className="w-full flex flex-col space-y-6">
-            <h2 className="text-4xl font-bold text-center mb-8 text-gray-900">INICIAR SESIÓN</h2>
-
+          <form onSubmit={handleLogin} className="space-y-4 sm:space-y-6">
+            
+            {/* ===== INPUT USUARIO ===== */}
             <input
               type="text"
               placeholder="Usuario"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
-              className="w-full p-4 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200 text-lg"
+              className="w-full rounded-lg focus:outline-none focus:ring-2 transition-all duration-200"
+              style={{
+                padding: 'clamp(12px, 2vw, 16px)', // 📱 12px móvil → 💻 16px desktop
+                fontSize: 'clamp(16px, 2vw, 18px)', // 📱 16px móvil → 💻 18px desktop
+                fontFamily: 'Arial, sans-serif',
+                border: '2px solid #D1D5DB',
+                backgroundColor: '#FFFFFF'
+              }}
             />
 
+            {/* ===== INPUT CONTRASEÑA ===== */}
             <input
               type="password"
               placeholder="Contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full p-4 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all duration-200 text-lg"
+              className="w-full rounded-lg focus:outline-none focus:ring-2 transition-all duration-200"
+              style={{
+                padding: 'clamp(12px, 2vw, 16px)',
+                fontSize: 'clamp(16px, 2vw, 18px)',
+                fontFamily: 'Arial, sans-serif',
+                border: '2px solid #D1D5DB',
+                backgroundColor: '#FFFFFF'
+              }}
             />
 
+            {/* ===== BOTÓN CONTINUAR ===== */}
             <button
               type="submit"
               disabled={loading}
-              className={`w-full p-4 rounded-lg text-black font-semibold text-lg transition-all duration-200 ${
-                loading
-                  ? "bg-gray-300 cursor-not-allowed"
-                  : "bg-yellow-300 hover:bg-yellow-400 border-2 border-black"
-              }`}
+              className="w-full rounded-lg font-semibold transition-all duration-200 hover:opacity-90"
+              style={{
+                padding: 'clamp(12px, 2vw, 16px)',
+                fontSize: 'clamp(18px, 2.5vw, 20px)',
+                fontFamily: 'Arial, sans-serif',
+                backgroundColor: loading ? '#D1D5DB' : '#FDE68A',
+                color: '#000000',
+                border: '2px solid #000000',
+                cursor: loading ? 'not-allowed' : 'pointer'
+              }}
             >
               {loading ? "Cargando..." : "Continuar"}
             </button>
 
-            <div className="text-center">
-              <a href="#" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+            {/* ===== LINK OLVIDÓ CONTRASEÑA ===== */}
+            <div className="text-center pt-2">
+              <a 
+                href="#" 
+                className="hover:underline transition-colors"
+                style={{
+                  fontSize: 'clamp(12px, 1.5vw, 14px)',
+                  fontFamily: 'Arial, sans-serif',
+                  color: '#6B7280'
+                }}
+              >
                 ¿Has olvidado la contraseña?
               </a>
             </div>
 
+            {/* ===== MENSAJE DE ERROR/ÉXITO ===== */}
             {message && (
               <p
-                className={`text-sm font-medium text-center px-4 py-3 rounded-lg w-full ${
-                  message.type === "error"
-                    ? "bg-red-100 text-red-700 border-2 border-red-300"
-                    : "bg-green-100 text-green-700 border-2 border-green-300"
-                }`}
+                className="text-center px-4 py-3 rounded-lg w-full font-medium"
+                style={{
+                  fontSize: 'clamp(12px, 1.5vw, 14px)',
+                  backgroundColor: message.type === "error" ? '#FEE2E2' : '#D1FAE5',
+                  color: message.type === "error" ? '#991B1B' : '#065F46',
+                  border: `2px solid ${message.type === "error" ? '#FCA5A5' : '#6EE7B7'}`
+                }}
               >
                 {message.text}
               </p>
