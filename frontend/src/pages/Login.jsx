@@ -40,9 +40,9 @@ function Login() {
   };
 
   return (
-    <AuthLayout>
-      <form onSubmit={handleLogin} className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8 flex flex-col items-center space-y-6">
-        <h2 className="text-3xl font-bold mb-6 text-gray-800">Iniciar Sesión</h2>
+    <div className="w-full max-w-sm sm:max-w-md lg:max-w-lg mx-auto bg-white shadow-xl rounded-2xl p-6 sm:p-8">  {/* Tarjeta para el form, debajo del navbar */}
+      <form onSubmit={handleLogin} className="w-full flex flex-col items-center space-y-6">
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">Iniciar Sesión</h2>  {/* Título del form (sin ícono para no repetir) */}
 
         <input
           type="text"
@@ -86,7 +86,7 @@ function Login() {
           </p>
         )}
       </form>
-    </AuthLayout>
+    </div>
   );
 }
 
