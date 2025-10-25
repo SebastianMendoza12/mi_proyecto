@@ -40,42 +40,42 @@ function Login() {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen">
+    <div className="flex flex-row min-h-screen">
       {/* ===== LADO IZQUIERDO - LOGO ===== */}
-      {/* 📱 En móvil: arriba | 💻 En desktop: izquierda (48.75%) */}
+      {/* Proporción: 702/1440 ≈ 48.75% del ancho total */}
       <div 
-        className="w-full lg:w-[48.75%] flex items-center justify-center py-8 lg:py-0"
-        style={{ backgroundColor: '#FFF9E6' }} // 🎨 CAMBIAR COLOR DE FONDO AQUÍ
+        className="w-[48.75%] flex items-center justify-center"
+        style={{ backgroundColor: '#FFF9E6' }} // 🎨 CAMBIAR COLOR DE FONDO AQUÍ (amarillo claro)
       >
         <img 
           src={logo} 
           alt="FastFood.exe Logo" 
-          className="w-3/4 max-w-sm lg:w-full lg:max-w-none lg:h-full object-contain p-4 lg:p-8"
+          className="w-full h-full object-contain p-8" // 📏 Ajustar padding del logo aquí (p-8, p-12, p-16, etc)
         />
       </div>
 
       {/* ===== LADO DERECHO - FORMULARIO ===== */}
-      {/* 📱 En móvil: abajo | 💻 En desktop: derecha (51.25%) */}
+      {/* Proporción: 738/1440 ≈ 51.25% del ancho total */}
       <div 
-        className="w-full lg:w-[51.25%] flex items-center justify-center p-6 sm:p-8 lg:p-12"
-        style={{ backgroundColor: '#FFFFFF' }} // 🎨 CAMBIAR COLOR DE FONDO AQUÍ
+        className="w-[51.25%] flex items-center justify-center p-12"
+        style={{ backgroundColor: '#FFFFFF' }} // 🎨 CAMBIAR COLOR DE FONDO AQUÍ (blanco)
       >
-        <div className="w-full max-w-md space-y-6 sm:space-y-8">
+        <div className="w-full max-w-md space-y-8"> {/* 📐 Cambiar max-w-md por max-w-sm, max-w-lg, max-w-xl para ancho del form */}
           
           {/* ===== TÍTULO ===== */}
           <h2 
-            className="text-center font-bold mb-8 sm:mb-12"
+            className="text-center font-bold mb-12"
             style={{ 
-              fontSize: 'clamp(32px, 5vw, 48px)', // 📱 32px móvil → 💻 48px desktop (se adapta automáticamente)
-              fontFamily: 'Arial, sans-serif',
-              color: '#000000',
-              letterSpacing: '2px'
+              fontSize: '48px',        // 📝 TAMAÑO DE FUENTE DEL TÍTULO
+              fontFamily: 'Arial, sans-serif', // 🔤 TIPO DE LETRA (Arial, 'Times New Roman', 'Courier New', etc)
+              color: '#000000',        // 🎨 COLOR DEL TÍTULO
+              letterSpacing: '2px'     // 📏 ESPACIADO ENTRE LETRAS
             }}
           >
             INICIAR SESIÓN
           </h2>
 
-          <form onSubmit={handleLogin} className="space-y-4 sm:space-y-6">
+          <form onSubmit={handleLogin} className="space-y-6"> {/* 📐 space-y-6 = espacio entre elementos (4, 6, 8, 10) */}
             
             {/* ===== INPUT USUARIO ===== */}
             <input
@@ -86,11 +86,11 @@ function Login() {
               required
               className="w-full rounded-lg focus:outline-none focus:ring-2 transition-all duration-200"
               style={{
-                padding: 'clamp(12px, 2vw, 16px)', // 📱 12px móvil → 💻 16px desktop
-                fontSize: 'clamp(16px, 2vw, 18px)', // 📱 16px móvil → 💻 18px desktop
-                fontFamily: 'Arial, sans-serif',
-                border: '2px solid #D1D5DB',
-                backgroundColor: '#FFFFFF'
+                padding: '16px',           // 📏 PADDING INTERNO DEL INPUT
+                fontSize: '18px',          // 📝 TAMAÑO DE FUENTE
+                fontFamily: 'Arial, sans-serif', // 🔤 TIPO DE LETRA
+                border: '2px solid #D1D5DB', // 🎨 BORDE (color y grosor)
+                backgroundColor: '#FFFFFF'  // 🎨 FONDO DEL INPUT
               }}
             />
 
@@ -103,11 +103,11 @@ function Login() {
               required
               className="w-full rounded-lg focus:outline-none focus:ring-2 transition-all duration-200"
               style={{
-                padding: 'clamp(12px, 2vw, 16px)',
-                fontSize: 'clamp(16px, 2vw, 18px)',
-                fontFamily: 'Arial, sans-serif',
-                border: '2px solid #D1D5DB',
-                backgroundColor: '#FFFFFF'
+                padding: '16px',           // 📏 PADDING INTERNO DEL INPUT
+                fontSize: '18px',          // 📝 TAMAÑO DE FUENTE
+                fontFamily: 'Arial, sans-serif', // 🔤 TIPO DE LETRA
+                border: '2px solid #D1D5DB', // 🎨 BORDE
+                backgroundColor: '#FFFFFF'  // 🎨 FONDO DEL INPUT
               }}
             />
 
@@ -117,12 +117,12 @@ function Login() {
               disabled={loading}
               className="w-full rounded-lg font-semibold transition-all duration-200 hover:opacity-90"
               style={{
-                padding: 'clamp(12px, 2vw, 16px)',
-                fontSize: 'clamp(18px, 2.5vw, 20px)',
-                fontFamily: 'Arial, sans-serif',
-                backgroundColor: loading ? '#D1D5DB' : '#FDE68A',
-                color: '#000000',
-                border: '2px solid #000000',
+                padding: '16px',                    // 📏 PADDING (altura del botón)
+                fontSize: '20px',                   // 📝 TAMAÑO DE FUENTE
+                fontFamily: 'Arial, sans-serif',    // 🔤 TIPO DE LETRA
+                backgroundColor: loading ? '#D1D5DB' : '#FDE68A', // 🎨 COLOR DE FONDO (amarillo claro)
+                color: '#000000',                   // 🎨 COLOR DEL TEXTO
+                border: '2px solid #000000',        // 🎨 BORDE NEGRO
                 cursor: loading ? 'not-allowed' : 'pointer'
               }}
             >
@@ -130,14 +130,14 @@ function Login() {
             </button>
 
             {/* ===== LINK OLVIDÓ CONTRASEÑA ===== */}
-            <div className="text-center pt-2">
+            <div className="text-center">
               <a 
                 href="#" 
                 className="hover:underline transition-colors"
                 style={{
-                  fontSize: 'clamp(12px, 1.5vw, 14px)',
-                  fontFamily: 'Arial, sans-serif',
-                  color: '#6B7280'
+                  fontSize: '14px',              // 📝 TAMAÑO DE FUENTE
+                  fontFamily: 'Arial, sans-serif', // 🔤 TIPO DE LETRA
+                  color: '#6B7280'               // 🎨 COLOR DEL TEXTO (gris)
                 }}
               >
                 ¿Has olvidado la contraseña?
@@ -149,10 +149,10 @@ function Login() {
               <p
                 className="text-center px-4 py-3 rounded-lg w-full font-medium"
                 style={{
-                  fontSize: 'clamp(12px, 1.5vw, 14px)',
-                  backgroundColor: message.type === "error" ? '#FEE2E2' : '#D1FAE5',
-                  color: message.type === "error" ? '#991B1B' : '#065F46',
-                  border: `2px solid ${message.type === "error" ? '#FCA5A5' : '#6EE7B7'}`
+                  fontSize: '14px',  // 📝 TAMAÑO DE FUENTE
+                  backgroundColor: message.type === "error" ? '#FEE2E2' : '#D1FAE5', // 🎨 FONDO
+                  color: message.type === "error" ? '#991B1B' : '#065F46', // 🎨 COLOR TEXTO
+                  border: `2px solid ${message.type === "error" ? '#FCA5A5' : '#6EE7B7'}` // 🎨 BORDE
                 }}
               >
                 {message.text}
