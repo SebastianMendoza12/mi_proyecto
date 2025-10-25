@@ -40,24 +40,9 @@ function Login() {
   };
 
   return (
-  <div className="flex flex-col md:flex-row w-full max-w-6xl h-screen bg-white shadow-2xl rounded-none md:rounded-2xl overflow-hidden">
-    
-    {/* --- IZQUIERDA: LOGO --- */}
-    <div className="w-full md:w-1/2 bg-gray-100 flex items-center justify-center p-8">
-      <img
-        src={logo}
-        alt="Logotipo FastFood.exe"
-        className="w-3/4 max-w-md object-contain"
-      />
-    </div>
-
-    {/* --- DERECHA: FORMULARIO --- */}
-    <div className="w-full md:w-1/2 flex items-center justify-center p-8 bg-white">
-      <form
-        onSubmit={handleLogin}
-        className="w-full max-w-sm sm:max-w-md flex flex-col items-center space-y-6"
-      >
-        <h2 className="text-3xl font-bold mb-6 text-gray-800">Iniciar Sesión</h2>
+    <div className="w-full max-w-sm sm:max-w-md lg:max-w-lg mx-auto bg-white shadow-xl rounded-2xl p-6 sm:p-8">  {/* Tarjeta para el form, debajo del navbar */}
+      <form onSubmit={handleLogin} className="w-full flex flex-col items-center space-y-6">
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">Iniciar Sesión</h2>  {/* Título del form (sin ícono para no repetir) */}
 
         <input
           type="text"
@@ -89,10 +74,6 @@ function Login() {
           {loading ? "⏳ Cargando..." : "🚀 Entrar"}
         </button>
 
-        <p className="text-sm text-gray-600 cursor-pointer hover:text-blue-500">
-          ¿Olvidaste tu contraseña?
-        </p>
-
         {message && (
           <p
             className={`text-sm font-medium text-center px-4 py-2 rounded-lg w-full ${
@@ -106,9 +87,7 @@ function Login() {
         )}
       </form>
     </div>
-  </div>
-);
-
+  );
 }
 
 export default Login;
