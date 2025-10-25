@@ -40,21 +40,22 @@ function Login() {
   };
 
   return (
-  <div className="flex flex-col lg:flex-row w-full h-screen bg-gray-100">
-    {/* Sección Izquierda (Logo) */}
-    <div className="lg:w-1/2 w-full flex justify-center items-center bg-white">
+  <div className="flex flex-col md:flex-row w-full max-w-6xl h-screen bg-white shadow-2xl rounded-none md:rounded-2xl overflow-hidden">
+    
+    {/* --- IZQUIERDA: LOGO --- */}
+    <div className="w-full md:w-1/2 bg-gray-100 flex items-center justify-center p-8">
       <img
         src={logo}
-        alt="Logo FastFood.exe"
-        className="max-w-full h-auto object-contain p-8"
+        alt="Logotipo FastFood.exe"
+        className="w-3/4 max-w-md object-contain"
       />
     </div>
 
-    {/* Sección Derecha (Formulario) */}
-    <div className="lg:w-1/2 w-full flex justify-center items-center bg-white shadow-inner">
+    {/* --- DERECHA: FORMULARIO --- */}
+    <div className="w-full md:w-1/2 flex items-center justify-center p-8 bg-white">
       <form
         onSubmit={handleLogin}
-        className="w-full max-w-sm sm:max-w-md lg:max-w-lg mx-auto flex flex-col items-center space-y-6 p-6 sm:p-8"
+        className="w-full max-w-sm sm:max-w-md flex flex-col items-center space-y-6"
       >
         <h2 className="text-3xl font-bold mb-6 text-gray-800">Iniciar Sesión</h2>
 
@@ -64,7 +65,7 @@ function Login() {
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
-          className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+          className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
         />
 
         <input
@@ -73,7 +74,7 @@ function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+          className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
         />
 
         <button
@@ -88,7 +89,7 @@ function Login() {
           {loading ? "⏳ Cargando..." : "🚀 Entrar"}
         </button>
 
-        <p className="text-sm text-gray-600 mt-2 hover:text-blue-500 cursor-pointer">
+        <p className="text-sm text-gray-600 cursor-pointer hover:text-blue-500">
           ¿Olvidaste tu contraseña?
         </p>
 
