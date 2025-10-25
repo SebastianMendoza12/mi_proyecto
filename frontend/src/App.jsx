@@ -60,7 +60,7 @@ function App() {
   const isFullScreenPage = fullScreenRoutes.includes(location.pathname);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-2 sm:px-4 lg:px-8 w-full">
+    <div className={isFullScreenPage ? "" : "flex flex-col items-center justify-center min-h-screen bg-gray-100 px-2 sm:px-4 lg:px-8 w-full"}>
       <Navbar />  {/* Navbar GLOBAL: Siempre arriba, con título y botones */}
         
       <Routes>  {/* Contenido que cambia debajo del navbar */}
