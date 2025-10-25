@@ -40,70 +40,41 @@ function Login() {
   };
 
   return (
-    <div className="flex min-h-[90vh] w-full bg-gray-100 rounded-2xl shadow-lg overflow-hidden">
-      {/* Lado Izquierdo - Imagen */}
-      <div className="hidden md:flex w-1/2 bg-blue-50 items-center justify-center">
+  <div className="min-h-screen bg-gray-100 text-gray-900 flex justify-center">
+    <div className="max-w-screen-xl m-0 sm:m-10 bg-white shadow sm:rounded-lg flex justify-center flex-1">
+      
+      {/* --- LADO IZQUIERDO --- */}
+      <div className="flex-1 bg-indigo-100 text-center hidden lg:flex">
+        <div
+          className="m-12 xl:m-16 w-full bg-contain bg-center bg-no-repeat"
+          style={{
+            backgroundImage:
+              "url('https://storage.googleapis.com/devitary-image-host.appspot.com/15848031292911696601-undraw_designer_life_w96d.svg')",
+          }}
+        ></div>
+      </div>
+
+      {/* --- LADO DERECHO --- */}
+      <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12 flex flex-col justify-center items-center">
         <img
-          src={logo}
+          src="https://storage.googleapis.com/devitary-image-host.appspot.com/15846435184459982716-LogoMakr_7POjrN.png"
           alt="Logo"
-          className="object-cover w-full h-full"
-          style={{ objectPosition: "center" }}
+          className="w-32 mb-8"
         />
+        <h1 className="text-2xl xl:text-3xl font-extrabold mb-6">Iniciar Sesión</h1>
+
+        {/* Aquí luego pondremos los inputs y botón */}
+        <div className="w-full max-w-sm">
+          <div className="bg-gray-100 p-6 rounded-lg shadow-inner">
+            <p className="text-gray-600 text-center">Aquí irá el formulario ✏️</p>
+          </div>
+        </div>
       </div>
 
-      {/* Lado Derecho - Formulario */}
-      <div className="flex flex-col justify-center items-center w-full md:w-1/2 p-8 sm:p-12 bg-white">
-        <h2 className="text-3xl font-bold text-gray-800 mb-8">Iniciar Sesión</h2>
-
-        <form
-          onSubmit={handleLogin}
-          className="w-full max-w-sm sm:max-w-md flex flex-col gap-5"
-        >
-          <input
-            type="text"
-            placeholder="Usuario"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-          />
-
-          <input
-            type="password"
-            placeholder="Contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-          />
-
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full p-4 rounded-xl text-white font-semibold transition-all duration-200 transform hover:scale-105 ${
-              loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 shadow-md"
-            }`}
-          >
-            {loading ? "⏳ Cargando..." : "Entrar"}
-          </button>
-
-          {message && (
-            <p
-              className={`text-sm font-medium text-center px-4 py-2 rounded-lg w-full ${
-                message.type === "error"
-                  ? "bg-red-100 text-red-700 border border-red-300"
-                  : "bg-green-100 text-green-700 border border-green-300"
-              }`}
-            >
-              {message.text}
-            </p>
-          )}
-        </form>
-      </div>
     </div>
-  );
+  </div>
+);
+
 }
 
 export default Login;
