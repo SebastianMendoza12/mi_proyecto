@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { loginUser  } from "../services/api";
-import { loginUser  } from "../assets/LogotipoProyecto.png";
+import logo from "../assets/LogotipoProyecto.png";
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -43,13 +43,11 @@ function Login() {
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* LADO IZQUIERDO */}
       <div className="hidden md:flex md:w-1/2 bg-[#FFFBD2] items-center justify-center">
-        <div className="flex flex-col items-center text-center">
-          <img
-            src={logo}
-            alt="Logo FastFood.exe"
-            className="w-56 h-56 object-contain mb-4"
-          />
-        </div>
+        <img
+          src={logo}
+          alt="Logo FastFood.exe"
+          className="w-72 h-auto object-contain"
+        />
       </div>
 
       {/* LADO DERECHO */}
