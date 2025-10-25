@@ -40,59 +40,118 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-900 flex justify-center">
-      <div className="max-w-screen-xl m-0 sm:m-10 bg-white shadow sm:rounded-lg flex justify-center flex-1">
+    <div className="min-h-screen bg-gray-100 flex justify-center items-center p-4">
+      <div className="w-full max-w-6xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col lg:flex-row">
         
-        {/* Lado izquierdo (imagen personalizada) */}
-        <div className="flex-1 bg-indigo-100 text-center hidden lg:flex items-center justify-center">
-          <img
-            src={logo}
-            alt="Logo del proyecto"
-            className="max-w-[80%] max-h-[80%] object-contain rounded-xl shadow-md"
-          />
+        {/* Lado Izquierdo - Imagen/Logo */}
+        <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 items-center justify-center p-12">
+          <div className="text-center">
+            <img
+              src={logo}
+              alt="Logo FastFood"
+              className="w-full max-w-md mx-auto mb-8 drop-shadow-2xl"
+            />
+            <h2 className="text-white text-3xl font-bold mb-4">
+              Bienvenido a FastFood.exe
+            </h2>
+            <p className="text-indigo-100 text-lg">
+              La mejor experiencia de pedidos en línea
+            </p>
+          </div>
         </div>
 
-        {/* Lado derecho (formulario) */}
-        <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
-          <div className="mt-4 flex flex-col items-center">
-            <h1 className="text-2xl xl:text-3xl font-extrabold text-gray-800 mb-6">
-              Iniciar Sesión
-            </h1>
+        {/* Lado Derecho - Formulario */}
+        <div className="w-full lg:w-1/2 p-8 sm:p-12 lg:p-16">
+          <div className="max-w-md mx-auto">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-2">
+                Iniciar Sesión
+              </h1>
+              <p className="text-gray-600">
+                Ingresa tus credenciales para continuar
+              </p>
+            </div>
 
-            <form onSubmit={handleLogin} className="w-full max-w-sm mx-auto space-y-4">
-              <input
-                className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-300 placeholder-gray-500 text-sm focus:outline-none focus:border-indigo-400 focus:bg-white"
-                type="text"
-                placeholder="Usuario"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
+            {/* Formulario */}
+            <form onSubmit={handleLogin} className="space-y-6">
+              {/* Input Usuario */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Usuario
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ingresa tu usuario"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 outline-none"
+                />
+              </div>
 
-              <input
-                className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-300 placeholder-gray-500 text-sm focus:outline-none focus:border-indigo-400 focus:bg-white"
-                type="password"
-                placeholder="Contraseña"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              {/* Input Contraseña */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Contraseña
+                </label>
+                <input
+                  type="password"
+                  placeholder="Ingresa tu contraseña"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 outline-none"
+                />
+              </div>
 
+              {/* Botón Submit */}
               <button
+                type="submit"
                 disabled={loading}
-                className="w-full tracking-wide font-semibold bg-indigo-500 text-white py-4 rounded-lg hover:bg-indigo-600 transition-all duration-300 ease-in-out focus:outline-none"
+                className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-lg disabled:cursor-not-allowed disabled:transform-none"
               >
-                {loading ? "Cargando..." : "Iniciar Sesión"}
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Cargando...
+                  </span>
+                ) : (
+                  "Iniciar Sesión"
+                )}
               </button>
 
+              {/* Mensaje de Error/Éxito */}
               {message && (
-                <p
-                  className={`mt-4 text-center text-sm font-semibold ${
-                    message.type === "error" ? "text-red-600" : "text-green-600"
+                <div
+                  className={`p-4 rounded-lg border ${
+                    message.type === "error"
+                      ? "bg-red-50 border-red-200 text-red-800"
+                      : "bg-green-50 border-green-200 text-green-800"
                   }`}
                 >
-                  {message.text}
-                </p>
+                  <p className="text-sm font-medium text-center">
+                    {message.text}
+                  </p>
+                </div>
               )}
             </form>
+
+            {/* Footer - Enlace a Registro */}
+            <div className="mt-8 text-center">
+              <p className="text-gray-600 text-sm">
+                ¿No tienes cuenta?{" "}
+                <a
+                  href="/register"
+                  className="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline"
+                >
+                  Regístrate aquí
+                </a>
+              </p>
+            </div>
           </div>
         </div>
       </div>
