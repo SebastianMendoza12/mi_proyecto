@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
-
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -105,24 +103,3 @@ button:focus-visible {
 }
 
 
-/* === LOGIN LAYOUT === */
-body {
-  background-color: #f3f4f6; /* gris claro general */
-}
-
-h2 {
-  font-family: "Poppins", sans-serif; /* Puedes cambiar la fuente si quieres */
-}
-
-button {
-  font-family: "Poppins", sans-serif;
-  letter-spacing: 0.5px;
-}
-
-/* Si quieres que el logo y el form tengan proporciones fijas */
-@media (min-width: 1024px) {
-  .login-container {
-    height: 1024px;
-    width: 1440px;
-  }
-}
