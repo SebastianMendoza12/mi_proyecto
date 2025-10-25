@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { loginUser  } from "../services/api";
-import logo from "../assets/LogotipoProyecto.png";
+import AuthLayout from "../components/AuthLayout";
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -40,138 +40,53 @@ function Login() {
   };
 
   return (
-    <div className="fixed inset-0 flex flex-row">
-      {/* ===== LADO IZQUIERDO - LOGO ===== */}
-      <div 
-        className="w-1/2 h-full flex items-center justify-center"
-        style={{ backgroundColor: '#FFF9E6' }} // 🎨 Color de fondo (igual al del logo)
-      >
-        <img 
-          src={logo} 
-          alt="FastFood.exe Logo" 
-          className="object-contain"
-          style={{
-            width: '450px',      // 📏 Tamaño del logo (ajusta aquí: 350px, 400px, 500px, etc)
-            height: 'auto'
-          }}
+    <AuthLayout>
+      <form onSubmit={handleLogin} className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8 flex flex-col items-center space-y-6">
+        <h2 className="text-3xl font-bold mb-6 text-gray-800">Iniciar Sesión</h2>
+
+        <input
+          type="text"
+          placeholder="Usuario"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+          className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
         />
-      </div>
 
-      {/* ===== LADO DERECHO - FORMULARIO ===== */}
-      <div 
-        className="w-1/2 h-full flex items-center justify-center"
-        style={{ backgroundColor: '#FFFFFF' }} // 🎨 Fondo blanco
-      >
-        <div className="w-full px-12" style={{ maxWidth: '500px' }}> {/* 📐 Ancho del formulario */}
-          
-          {/* ===== TÍTULO ===== */}
-          <h2 
-            className="text-center font-bold mb-16"
-            style={{ 
-              fontSize: '48px',                    // 📝 Tamaño del título
-              fontFamily: 'Arial, sans-serif',     // 🔤 Tipo de letra
-              color: '#000000',                    // 🎨 Color
-              letterSpacing: '2px',                // 📏 Espaciado
-              fontWeight: '900'
-            }}
+        <input
+          type="password"
+          placeholder="Contraseña"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+        />
+
+        <button
+          type="submit"
+          disabled={loading}
+          className={`w-full p-4 rounded-xl text-white font-semibold transition-all duration-200 transform hover:scale-105 ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700 shadow-md"
+          }`}
+        >
+          {loading ? "⏳ Cargando..." : "🚀 Entrar"}
+        </button>
+
+        {message && (
+          <p
+            className={`text-sm font-medium text-center px-4 py-2 rounded-lg w-full ${
+              message.type === "error"
+                ? "bg-red-100 text-red-700 border border-red-300"
+                : "bg-green-100 text-green-700 border border-green-300"
+            }`}
           >
-            INICIAR SESIÓN
-          </h2>
-
-          <form onSubmit={handleLogin} className="space-y-5"> {/* 📐 Espacio entre elementos: space-y-4, 5, 6 */}
-            
-            {/* ===== INPUT USUARIO ===== */}
-            <input
-              type="text"
-              placeholder="Usuario"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              className="w-full focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all duration-200"
-              style={{
-                padding: '16px 20px',              // 📏 Padding interno
-                fontSize: '16px',                  // 📝 Tamaño fuente
-                fontFamily: 'Arial, sans-serif',   // 🔤 Tipo letra
-                border: '1px solid #E5E7EB',       // 🎨 Borde
-                borderRadius: '8px',               // 📐 Redondeo esquinas
-                backgroundColor: '#FFFFFF',
-                color: '#9CA3AF'                   // 🎨 Color placeholder
-              }}
-            />
-
-            {/* ===== INPUT CONTRASEÑA ===== */}
-            <input
-              type="password"
-              placeholder="Contraseña"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all duration-200"
-              style={{
-                padding: '16px 20px',
-                fontSize: '16px',
-                fontFamily: 'Arial, sans-serif',
-                border: '1px solid #E5E7EB',
-                borderRadius: '8px',
-                backgroundColor: '#FFFFFF',
-                color: '#9CA3AF'
-              }}
-            />
-
-            {/* ===== BOTÓN CONTINUAR ===== */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full font-semibold transition-all duration-200 hover:opacity-90 mt-6"
-              style={{
-                padding: '16px',                               // 📏 Altura del botón
-                fontSize: '18px',                              // 📝 Tamaño texto
-                fontFamily: 'Arial, sans-serif',               // 🔤 Tipo letra
-                backgroundColor: loading ? '#D1D5DB' : '#FDE68A', // 🎨 Color fondo (amarillo)
-                color: '#000000',                              // 🎨 Color texto
-                border: '2px solid #000000',                   // 🎨 Borde negro
-                borderRadius: '8px',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                fontWeight: '600'
-              }}
-            >
-              {loading ? "Cargando..." : "Continuar"}
-            </button>
-
-            {/* ===== LINK OLVIDÓ CONTRASEÑA ===== */}
-            <div className="text-center pt-4">
-              <a 
-                href="#" 
-                className="hover:underline transition-colors"
-                style={{
-                  fontSize: '14px',                  // 📝 Tamaño
-                  fontFamily: 'Arial, sans-serif',   // 🔤 Tipo letra
-                  color: '#6B7280'                   // 🎨 Color gris
-                }}
-              >
-                ¿Has olvidado la contraseña?
-              </a>
-            </div>
-
-            {/* ===== MENSAJE DE ERROR/ÉXITO ===== */}
-            {message && (
-              <p
-                className="text-center px-4 py-3 w-full font-medium mt-4"
-                style={{
-                  fontSize: '14px',
-                  backgroundColor: message.type === "error" ? '#FEE2E2' : '#D1FAE5',
-                  color: message.type === "error" ? '#991B1B' : '#065F46',
-                  border: `2px solid ${message.type === "error" ? '#FCA5A5' : '#6EE7B7'}`,
-                  borderRadius: '8px'
-                }}
-              >
-                {message.text}
-              </p>
-            )}
-          </form>
-        </div>
-      </div>
-    </div>
+            {message.text}
+          </p>
+        )}
+      </form>
+    </AuthLayout>
   );
 }
 
