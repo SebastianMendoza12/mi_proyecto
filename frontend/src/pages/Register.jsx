@@ -4,7 +4,9 @@ import logo from "../assets/LogotipoProyecto.png";
 
 function Register() {
   const [username, setUsername] = useState("");
+  const [telefono, setTelefono] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -57,20 +59,28 @@ function Register() {
 
   const passwordStrength = checkPasswordStrength(password);
 
+  // Validar que las contraseñas coincidan
+  const passwordsMatch = password && confirmPassword && password === confirmPassword;
+  const showPasswordMismatch = confirmPassword && password !== confirmPassword;
+
   const handleRegister = async (e) => {
     e.preventDefault();
     setMessage(null);
+    if (password !== confirmPassword) {setMessage({ text: "❌ Las contraseñas no coinciden", type: "error" });
+      return;
+    }
     setLoading(true);
 
     // Limpieza automática: Remueve tokens viejos antes de register (evita "expired")
     localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");  // Si usas refresh tokens
+    localStorage.removeItem("refresh_token"); 
 
     try {
       await registerUser({ username, password });
       setMessage({ text: "✅ Usuario creado exitosamente. Ahora puedes iniciar sesión.", type: "success" });
       setUsername("");
-      setPassword("");  // Limpia campos para UX mejor
+      setPassword("");
+      setConfirmPassword("");
     } catch (err) {
       const status = err.response?.status;
       const errorDetail = err.response?.data?.detail || err.response?.data?.error || err.message || "";
@@ -182,6 +192,29 @@ function Register() {
               )}
               {/* ============ FIN BARRA ============ */}
 
+            </div>
+            
+            {/* Confirmar Contraseña */}
+            <div>
+              <input
+                type="password"
+                placeholder="Confirmar contraseña"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                className={`w-full px-6 py-4 rounded-lg border-2 transition-all duration-200 text-gray-700 placeholder-gray-400 focus:outline-none ${
+                  showPasswordMismatch 
+                    ? "border-red-400 focus:border-red-500" 
+                    : passwordsMatch 
+                    ? "border-green-400 focus:border-green-500"
+                    : "border-gray-300 focus:border-gray-400"
+                }`}
+              />
+              {confirmPassword && (
+                <p className={`mt-2 text-sm font-medium ${passwordsMatch ? "text-green-600" : "text-red-600"}`}>
+                  {passwordsMatch ? "✓ Las contraseñas coinciden" : "✗ Las contraseñas no coinciden"}
+                </p>
+              )}
             </div>
 
             {/* Botón Submit */}
