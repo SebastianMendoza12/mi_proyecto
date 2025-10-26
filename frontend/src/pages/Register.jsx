@@ -129,12 +129,12 @@ function Register() {
           <div className="mt-8 text-center">
             <p className="text-gray-600 text-sm">
               ¿Ya tienes cuenta?{" "}
-              <Link
+              <a
                 to="/login"
                 className="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline"
               >
                 Inicia sesión aquí
-              </Link>
+              </a>
             </p>
           </div>
         </div>
