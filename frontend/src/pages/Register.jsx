@@ -8,6 +8,55 @@ function Register() {
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const checkPasswordStrength = (pass) => {
+    if (!pass) return { level: 0, text: "", color: "", bgColor: "", width: "0%" };
+
+    let strength = 0;
+    const checks = {
+      length: pass.length >= 8,
+      uppercase: /[A-Z]/.test(pass),
+      lowercase: /[a-z]/.test(pass),
+      number: /[0-9]/.test(pass),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(pass),
+    };
+
+    if (checks.length) strength++;
+    if (checks.uppercase && checks.lowercase) strength++;
+    if (checks.number) strength++;
+    if (checks.special) strength++;
+
+    if (strength <= 1) {
+      return { 
+        level: 1, 
+        text: "Débil", 
+        color: "text-red-600", 
+        bgColor: "bg-red-500",
+        width: "33%",
+        requirements: checks
+      };
+    } else if (strength <= 3) {
+      return { 
+        level: 2, 
+        text: "Media", 
+        color: "text-yellow-600", 
+        bgColor: "bg-yellow-500",
+        width: "66%",
+        requirements: checks
+      };
+    } else {
+      return { 
+        level: 3, 
+        text: "Fuerte", 
+        color: "text-green-600", 
+        bgColor: "bg-green-500",
+        width: "100%",
+        requirements: checks
+      };
+    }
+  };
+
+  const passwordStrength = checkPasswordStrength(password);
+
   const handleRegister = async (e) => {
     e.preventDefault();
     setMessage(null);
@@ -36,7 +85,7 @@ function Register() {
       } else if (errorDetail.includes("already exists") || errorDetail.includes("taken") || status === 409) {
         errorText = "❌ El usuario ya existe. Elige otro nombre.";
       } else if (errorDetail.includes("password") || status === 400) {
-        errorText = "❌ La contraseña debe tener al menos 8 caracteres y ser segura.";
+        errorText = "❌ La contraseña no cumple los requisitos de seguridad.";
       } else if (errorDetail.includes("network") || !err.response) {
         errorText = "❌ Error de conexión. Verifica tu internet e inténtalo de nuevo.";
       } else {
@@ -97,6 +146,42 @@ function Register() {
                 required
                 className="w-full px-6 py-4 rounded-lg border-2 border-gray-300 focus:border-gray-400 focus:outline-none transition-all duration-200 text-gray-700 placeholder-gray-400"
               />
+
+              {/* ============ Barra de seguridad ============ */}
+              {password && (
+                <div className="mt-3 space-y-2">
+                  {/* Barra de progreso */}
+                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full ${passwordStrength.bgColor} transition-all duration-300`}
+                      style={{ width: passwordStrength.width }}
+                    />
+                  </div>
+
+                  {/* Texto de nivel */}
+                  <p className={`text-sm font-semibold ${passwordStrength.color}`}>
+                    Seguridad: {passwordStrength.text}
+                  </p>
+
+                  {/* Requisitos */}
+                  <div className="text-xs space-y-1 text-gray-600">
+                    <p className={passwordStrength.requirements?.length ? "text-green-600" : ""}>
+                      {passwordStrength.requirements?.length ? "✓" : "○"} Mínimo 8 caracteres
+                    </p>
+                    <p className={passwordStrength.requirements?.uppercase && passwordStrength.requirements?.lowercase ? "text-green-600" : ""}>
+                      {passwordStrength.requirements?.uppercase && passwordStrength.requirements?.lowercase ? "✓" : "○"} Mayúsculas y minúsculas
+                    </p>
+                    <p className={passwordStrength.requirements?.number ? "text-green-600" : ""}>
+                      {passwordStrength.requirements?.number ? "✓" : "○"} Al menos un número
+                    </p>
+                    <p className={passwordStrength.requirements?.special ? "text-green-600" : ""}>
+                      {passwordStrength.requirements?.special ? "✓" : "○"} Carácter especial (!@#$%^&*)
+                    </p>
+                  </div>
+                </div>
+              )}
+              {/* ============ FIN BARRA ============ */}
+
             </div>
 
             {/* Botón Submit */}
