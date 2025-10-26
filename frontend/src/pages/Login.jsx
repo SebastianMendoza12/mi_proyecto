@@ -57,8 +57,8 @@ function Login() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 bg-white">
         <div className="w-full max-w-md">
           {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-3">
+          <div className="text-center" style={{ marginBottom: '3rem' }}>
+            <h1 className="text-4xl sm:text-5xl font-black text-gray-900">
               INICIAR SESIÓN
             </h1>
           </div>
@@ -66,7 +66,7 @@ function Login() {
           {/* Formulario */}
           <form onSubmit={handleLogin}>
             {/* Input Usuario */}
-            <div className="mb-6">
+            <div style={{ marginBottom: '1.5rem' }}>
               <input
                 type="text"
                 placeholder="Usuario"
