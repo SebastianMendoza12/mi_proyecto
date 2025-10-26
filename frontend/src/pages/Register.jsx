@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { registerUser } from "../services/api";  // Asumiendo que api.js tiene registerUser con Axios
+import logo from "../assets/LogotipoProyecto.png";
 
 function Register() {
   const [username, setUsername] = useState("");
@@ -52,10 +53,7 @@ function Register() {
     <div className="min-h-screen bg-white flex w-full">
     
       {/* Lado Izquierdo - Logo con fondo crema/beige */}
-      <div
-        className="hidden lg:flex lg:w-1/2 items-center justify-center p-12"
-        style={{ backgroundColor: "#FDFED6" }}
-      >
+      <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-12" style={{ backgroundColor: "#FDFED6" }}>
         <div className="flex items-center justify-center w-full h-full">
           <img
             src={logo}
