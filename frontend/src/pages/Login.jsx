@@ -57,16 +57,16 @@ function Login() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 bg-white">
         <div className="w-full max-w-md">
           {/* Header */}
-          <div className="text-center mb-10">
+          <div className="text-center mb-12">
             <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-3">
               INICIAR SESIÓN
             </h1>
           </div>
 
           {/* Formulario */}
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleLogin}>
             {/* Input Usuario */}
-            <div>
+            <div className="mb-6">
               <input
                 type="text"
                 placeholder="Usuario"
@@ -78,7 +78,7 @@ function Login() {
             </div>
 
             {/* Input Contraseña */}
-            <div>
+            <div className="mb-6">
               <input
                 type="password"
                 placeholder="Contraseña"
@@ -93,7 +93,7 @@ function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-5 rounded-lg font-bold text-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-5 rounded-lg font-bold text-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
               style={{ backgroundColor: '#F5F0D8', color: '#000' }}
             >
               {loading ? "Cargando..." : "Continuar"}
