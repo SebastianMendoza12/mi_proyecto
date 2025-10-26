@@ -78,7 +78,7 @@ function Login() {
             </div>
 
             {/* Input Contraseña */}
-            <div className="mb-6">
+            <div style={{ marginBottom: '1.5rem' }}>
               <input
                 type="password"
                 placeholder="Contraseña"
@@ -90,14 +90,16 @@ function Login() {
             </div>
 
             {/* Botón Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-5 rounded-lg font-bold text-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
-              style={{ backgroundColor: '#F5F0D8', color: '#000' }}
-            >
-              {loading ? "Cargando..." : "Continuar"}
-            </button>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-5 rounded-lg font-bold text-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+                style={{ backgroundColor: '#F5F0D8', color: '#000' }}
+              >
+                {loading ? "Cargando..." : "Continuar"}
+              </button>
+            </div>
 
             {/* Mensaje de Error/Éxito */}
             {message && (
@@ -116,7 +118,7 @@ function Login() {
           </form>
 
           {/* Footer - Enlace recuperar contraseña */}
-          <div className="mt-8 text-center">
+          <div className="text-center">
             <a
               href="#"
               className="text-gray-600 hover:text-gray-900 text-sm font-medium hover:underline"
@@ -126,7 +128,7 @@ function Login() {
           </div>
 
           {/* Footer - Enlace a Registro */}
-          <div className="mt-8 text-center">
+          <div className="text-center">
             <p className="text-gray-600 text-sm">
               ¿No tienes cuenta?{" "}
               <a
