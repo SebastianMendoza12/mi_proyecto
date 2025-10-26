@@ -49,52 +49,98 @@ function Register() {
   };
 
   return (
-    <div className="w-full max-w-sm sm:max-w-md lg:max-w-lg mx-auto bg-white shadow-xl rounded-2xl p-6 sm:p-8">
-      <form onSubmit={handleRegister} className="w-full flex flex-col items-center space-y-6">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">Registro de Usuario</h2>
+    <div className="min-h-screen bg-white flex w-full">
+    
+      {/* Lado Izquierdo - Logo con fondo crema/beige */}
+      <div
+        className="hidden lg:flex lg:w-1/2 items-center justify-center p-12"
+        style={{ backgroundColor: "#FDFED6" }}
+      >
+        <div className="flex items-center justify-center w-full h-full">
+          <img
+            src={logo}
+            alt="FastFood.exe Logo"
+            className="max-w-md w-full h-auto object-contain"
+          />
+        </div>
+      </div>
 
-        <input
-          type="text"
-          placeholder="Usuario"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-          className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-        />
+      {/* Lado Derecho - Formulario */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 bg-white">
+        <div className="w-full max-w-md">
+          {/* Header */}
+          <div className="text-center mb-10">
+            <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-3">
+              REGISTRARSE
+            </h1>
+          </div>
 
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-        />
+          {/* Formulario */}
+          <form onSubmit={handleRegister} className="space-y-6">
+            {/* Input Usuario */}
+            <div>
+              <input
+                type="text"
+                placeholder="Usuario"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                className="w-full px-6 py-4 rounded-lg border-2 border-gray-300 focus:border-gray-400 focus:outline-none transition-all duration-200 text-gray-700 placeholder-gray-400"
+              />
+            </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className={`w-full p-4 rounded-xl text-white font-semibold transition-all duration-200 transform hover:scale-105 ${
-            loading
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700 shadow-md"
-          }`}
-        >
-          {loading ? "⏳ Cargando..." : "📝 Registrarse"}
-        </button>
+            {/* Input Contraseña */}
+            <div>
+              <input
+                type="password"
+                placeholder="Contraseña"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full px-6 py-4 rounded-lg border-2 border-gray-300 focus:border-gray-400 focus:outline-none transition-all duration-200 text-gray-700 placeholder-gray-400"
+              />
+            </div>
 
-        {message && (
-          <p
-            className={`text-sm font-medium text-center px-4 py-2 rounded-lg w-full ${
-              message.type === "error"
-                ? "bg-red-100 text-red-700 border border-red-300"
-                : "bg-green-100 text-green-700 border border-green-300"
-            }`}
-          >
-            {message.text}
-          </p>
-        )}
-      </form>
+            {/* Botón Submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-4 rounded-lg font-bold text-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ backgroundColor: "#F5F0D8", color: "#000" }}
+            >
+              {loading ? "Creando cuenta..." : "Registrarse"}
+            </button>
+
+            {/* Mensaje de Error/Éxito */}
+            {message && (
+              <div
+                className={`p-4 rounded-lg border-2 ${
+                  message.type === "error"
+                    ? "bg-red-50 border-red-300 text-red-800"
+                    : "bg-green-50 border-green-300 text-green-800"
+                }`}
+              >
+                <p className="text-sm font-medium text-center">
+                  {message.text}
+                </p>
+              </div>
+            )}
+          </form>
+
+          {/* Footer - Enlace a Inicio de Sesión */}
+          <div className="mt-8 text-center">
+            <p className="text-gray-600 text-sm">
+              ¿Ya tienes cuenta?{" "}
+              <Link
+                to="/login"
+                className="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline"
+              >
+                Inicia sesión aquí
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
