@@ -124,6 +124,19 @@ function Login() {
               ¿Has olvidado la contraseña?
             </a>
           </div>
+
+          {/* Footer - Enlace a Registro */}
+          <div className="mt-8 text-center">
+            <p className="text-gray-600 text-sm">
+              ¿No tienes cuenta?{" "}
+              <a
+                href="/register"
+                className="text-indigo-600 hover:text-indigo-700 font-semibold hover:underline"
+              >
+                Regístrate aquí
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </div>
