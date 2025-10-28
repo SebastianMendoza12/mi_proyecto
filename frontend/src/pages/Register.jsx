@@ -126,16 +126,16 @@ function Register() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 bg-white">
         <div className="w-full max-w-md">
           {/* Header */}
-          <div className="text-center mb-10">
-            <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-3">
+          <div className="text-center"style={{ marginBottom: '3rem' }}>
+            <h1 className="text-4xl sm:text-5xl font-black text-gray-900">
               REGISTRARSE
             </h1>
           </div>
 
           {/* Formulario */}
-          <form onSubmit={handleRegister} className="space-y-6">
+          <form onSubmit={handleRegister}>
             {/* Input Usuario */}
-            <div>
+            <div style={{ marginBottom: '1.5rem' }}>
               <input
                 type="text"
                 placeholder="Usuario"
@@ -147,7 +147,7 @@ function Register() {
             </div>
 
             {/* Input Contraseña */}
-            <div>
+            <div style={{ marginBottom: '1.5rem' }}>
               <input
                 type="password"
                 placeholder="Contraseña"
@@ -195,7 +195,7 @@ function Register() {
             </div>
             
             {/* Confirmar Contraseña */}
-            <div>
+            <div style={{ marginBottom: '1.5rem' }}>
               <input
                 type="password"
                 placeholder="Confirmar contraseña"
@@ -218,14 +218,16 @@ function Register() {
             </div>
 
             {/* Botón Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-5 rounded-lg font-bold text-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ backgroundColor: "#F5F0D8", color: "#000" }}
-            >
-              {loading ? "Creando cuenta..." : "Registrarse"}
-            </button>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-5 rounded-lg font-bold text-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ backgroundColor: "#F5F0D8", color: "#000" }}
+              >
+                {loading ? "Creando cuenta..." : "Registrarse"}
+              </button>
+            </div>
 
             {/* Mensaje de Error/Éxito */}
             {message && (
@@ -244,7 +246,7 @@ function Register() {
           </form>
 
           {/* Footer - Enlace a Inicio de Sesión */}
-          <div className="mt-8 text-center">
+          <div className="text-center">
             <p className="text-gray-600 text-sm">
               ¿Ya tienes cuenta?{" "}
               <a
