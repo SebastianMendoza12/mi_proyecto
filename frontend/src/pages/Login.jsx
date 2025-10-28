@@ -44,7 +44,7 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex w-full">
+    <div className="min-h-screen bg-white flex h-full">
       
       {/* Lado Izquierdo - Logo con fondo crema/beige */}
       <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-12" style={{ backgroundColor: '#FDFED6' }}>
