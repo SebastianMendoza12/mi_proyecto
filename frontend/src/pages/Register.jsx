@@ -87,7 +87,7 @@ function Register() {
 
       let errorText = "❌ Error al registrar usuario. Inténtalo de nuevo.";
 
-      // 1. Verificar PRIMERO si el usuario ya existe (más específico)
+      // 1. Verificar PRIMERO si el usuario ya existe 
       if (errorDetail.toLowerCase().includes("already exists") || 
           errorDetail.toLowerCase().includes("ya existe") ||
           errorDetail.toLowerCase().includes("taken") || 
@@ -95,15 +95,13 @@ function Register() {
           status === 409) {
         errorText = "❌ El usuario ya existe. Elige otro nombre.";
       }
-  
-      // 2. Validar contraseña débil (backend)
+      // 2. Validar contraseña débil 
       else if (errorDetail.toLowerCase().includes("password") && 
           (errorDetail.toLowerCase().includes("weak") || 
           errorDetail.toLowerCase().includes("débil") ||
           errorDetail.toLowerCase().includes("debe contener"))) {
         errorText = "❌ La contraseña no cumple los requisitos de seguridad.";
       }
-  
       // 3. Errores de autenticación
       else if (status === 401 || 
           errorDetail.includes("Token is expired") || 
@@ -112,17 +110,14 @@ function Register() {
         errorText = "❌ Error temporal en la autenticación. Limpia la caché e inténtalo de nuevo.";
         localStorage.clear();
       }
-  
       // 4. Errores de red
       else if (errorDetail.includes("network") || !err.response) {
         errorText = "❌ Error de conexión. Verifica tu internet e inténtalo de nuevo.";
       } 
-  
       // 5. Error genérico 400 (solo si no coincidió nada anterior)
       else if (status === 400) {
         errorText = `❌ ${errorDetail || "Datos inválidos. Verifica la información."}`;
       }
-  
       // 6. Otros errores
       else {
         errorText = `❌ ${errorDetail || "Ocurrió un error inesperado. Contacta soporte."}`;
