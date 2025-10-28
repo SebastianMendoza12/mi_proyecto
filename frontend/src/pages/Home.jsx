@@ -206,7 +206,7 @@ export default function Home() {
       </section>
 
       {/* ========== FOOTER ========== */}
-      <footer className="bg-gray-900 text-white py-8 mt-12">
+      <footer className="bg-gray-900 text-white py-8">
         <div className="max-w-7xl mx-auto px-4 flex justify-end items-center">
           <div className="flex items-center gap-6">
             <span className="font-semibold text-lg">contacto</span>
