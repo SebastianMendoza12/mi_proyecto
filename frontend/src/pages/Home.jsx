@@ -70,7 +70,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex w-full">
+    <div className="min-h-screen bg-white">
       {/* ========== HEADER ========== */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4">
