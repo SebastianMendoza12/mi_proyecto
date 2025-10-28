@@ -1,9 +1,30 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { logout } from "../services/api";
 import logo from "../assets/LogotipoProyecto.png";
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
+  const navigate = useNavigate();
+
+  // Verificar si está logueado
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    const user = localStorage.getItem("username"); // Guardaremos el username en login
+    if (token) {
+      setIsLoggedIn(true);
+      setUsername(user || "Usuario");
+    }
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    setIsLoggedIn(false);
+    setUsername("");
+    navigate("/");
+  };
 
   // ====== DATOS ESTÁTICOS ======
   const categories = [
@@ -57,22 +78,46 @@ export default function Home() {
             {/* Logo */}
             <img src={logo} alt="FastFood.exe" className="h-16 w-auto" />
 
-            {/* Botones Login y Registro */}
-            <div className="flex gap-3">
-              <Link
-                to="/login"
-                className="px-8 py-3 rounded-full font-semibold text-white transition-all"
-                style={{ backgroundColor: '#808080' }}
-              >
-                INICIAR SESIÓN
-              </Link>
-              <Link
-                to="/register"
-                className="px-8 py-3 rounded-full font-semibold text-white transition-all"
-                style={{ backgroundColor: '#808080' }}
-              >
-                REGISTRARSE
-              </Link>
+            {/* Botones según estado de login */}
+            <div className="flex items-center gap-4">
+              {isLoggedIn ? (
+                <>
+                  <span className="text-gray-700 font-semibold">
+                    BIENVENIDO {username.toUpperCase()}
+                  </span>
+                  <Link
+                    to="/mi-cuenta"
+                    className="px-6 py-3 rounded-full font-semibold text-white transition-all"
+                    style={{ backgroundColor: '#808080' }}
+                  >
+                    MI CUENTA
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="px-6 py-3 rounded-full font-semibold text-white transition-all hover:opacity-90"
+                    style={{ backgroundColor: '#DC143C' }}
+                  >
+                    CERRAR SESIÓN
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="px-8 py-3 rounded-full font-semibold text-white transition-all"
+                    style={{ backgroundColor: '#808080' }}
+                  >
+                    INICIAR SESIÓN
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="px-8 py-3 rounded-full font-semibold text-white transition-all"
+                    style={{ backgroundColor: '#808080' }}
+                  >
+                    REGISTRARSE
+                  </Link>
+                </>
+              )}
             </div>
           </div>
 
