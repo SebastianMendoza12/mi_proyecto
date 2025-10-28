@@ -12,7 +12,7 @@ export default function Home() {
   // Verificar si está logueado
   useEffect(() => {
     const token = localStorage.getItem("access_token");
-    const user = localStorage.getItem("username"); // Guardaremos el username en login
+    const user = localStorage.getItem("username"); 
     if (token) {
       setIsLoggedIn(true);
       setUsername(user || "Usuario");
@@ -42,25 +42,25 @@ export default function Home() {
       id: 1,
       name: "2 pizzas medianas + 1 ltr de gaseosa",
       price: 53900,
-      image: "https://via.placeholder.com/300x200/FF6B6B/FFFFFF?text=Pizza",
+      image: "",
     },
     {
       id: 2,
       name: "4 perros calientes + 1 ltr de gaseosa",
       price: 42900,
-      image: "https://via.placeholder.com/300x200/4ECDC4/FFFFFF?text=Hot+Dogs",
+      image: "",
     },
     {
       id: 3,
       name: "3 hamburguesas doble carne + ltr de gaseosa",
       price: 60900,
-      image: "https://via.placeholder.com/300x200/95E1D3/FFFFFF?text=Burgers",
+      image: "",
     },
     {
       id: 4,
       name: "1 picada para dos + 1 ltr de gaseosa",
       price: 35900,
-      image: "https://via.placeholder.com/300x200/F38181/FFFFFF?text=Picada",
+      image: "",
     }
   ];
 
