@@ -34,7 +34,7 @@ function Login() {
       } else if (errorDetail.includes("inactive")) {
         errorText = "❌ Cuenta inactiva. Contacta al administrador";
       } else {
-        errorText = `❌ ${errorDetail || "Ocurrió un error inesperado"}`;  // Solo si es necesario
+        errorText = `❌ ${errorDetail || "Ocurrió un error inesperado"}`;  
       }
       
       setMessage({ text: errorText, type: "error" });
