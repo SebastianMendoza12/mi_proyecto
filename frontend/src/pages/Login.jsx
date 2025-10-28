@@ -16,7 +16,11 @@ function Login() {
     try {
       const res = await loginUser ({ username, password });
       setMessage({ text: "✅ Inicio de sesión exitoso", type: "success" });
+      localStorage.setItem("username", username);
       console.log("Token:", res.data);
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1000);
       
     } catch (err) {
       const errorDetail = err.response?.data?.detail || err.response?.data?.error || "";
