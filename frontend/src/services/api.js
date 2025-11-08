@@ -11,8 +11,16 @@ const api = axios.create({
 // Interceptor request -> adjunta access token si existe
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("access_token");
-    if (token) config.headers.Authorization = `Bearer ${token}`;
+    // Lista de rutas que NO necesitan token
+    const publicRoutes = ['/api/auth/register/', '/api/login/'];
+    const isPublicRoute = publicRoutes.some(route => config.url?.includes(route));
+    
+    // Solo agrega el token si NO es una ruta pública
+    if (!isPublicRoute) {
+      const token = localStorage.getItem("access_token");
+      if (token) config.headers.Authorization = `Bearer ${token}`;
+    }
+    
     return config;
   },
   (error) => Promise.reject(error)
@@ -41,7 +49,14 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     if (!originalRequest) return Promise.reject(error);
+    // Lista de rutas públicas que NO deben intentar refrescar token
+    const publicRoutes = ['/api/auth/register/', '/api/login/'];
+    const isPublicRoute = publicRoutes.some(route => originalRequest.url?.includes(route));
 
+    // Si es ruta pública, no intentar refrescar token
+    if (isPublicRoute) {
+      return Promise.reject(error);
+    }
     // si 401 y no hemos reintentado
     if (error.response && error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
