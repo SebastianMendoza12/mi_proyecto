@@ -70,13 +70,13 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white">
       {/* ========== HEADER ========== */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-6">
             {/* Logo */}
-            <img src={logo} alt="FastFood.exe" className="h-24 w-auto" />
+            <img src={logo} alt="FastFood.exe" className="h-16 w-auto" />
 
             {/* Botones según estado de login */}
             <div className="flex items-center gap-4">
@@ -168,7 +168,7 @@ export default function Home() {
       </section>
 
       {/* ========== PRODUCTOS ========== */}
-      <section className="py-12 flex-grow">
+      <section className="py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-4xl font-bold text-center mb-10">Lo mas vendido</h2>
           
@@ -206,7 +206,7 @@ export default function Home() {
       </section>
 
       {/* ========== FOOTER ========== */}
-      <footer className="bg-gray-900 text-white py-6 mt-auto">
+      <footer className="bg-gray-900 text-white py-8">
         <div className="max-w-7xl mx-auto px-4 flex justify-end items-center">
           <div className="flex items-center gap-6">
             <span className="font-semibold text-lg">contacto</span>
