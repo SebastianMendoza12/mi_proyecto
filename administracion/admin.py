@@ -30,12 +30,21 @@ class DetalleVentaInline(admin.TabularInline):
 class VentaAdmin(admin.ModelAdmin):
     list_display = ('id', 'usuario', 'fecha_venta', 'total')
     list_filter = ('fecha_venta',)
-    # Muestra los detalles de venta dentro del formulario de Venta
     inlines = [DetalleVentaInline] 
-    readonly_fields = ('total', 'fecha_venta')
+    # Dejamos estos como solo lectura, pues ahora se llenan automáticamente
+    readonly_fields = ('total', 'fecha_venta') 
     ordering = ('-fecha_venta',)
 
-
+    # Este método se llama después de guardar la Venta y sus Detalles (inlines)
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        
+        # Obtenemos la instancia de la Venta que acabamos de guardar
+        venta = form.instance
+        
+        # Llamamos a la función de lógica de negocio para calcular el total
+        # ¡Esto actualiza y guarda los campos total y fecha_venta!
+        venta.calcular_total()
 # ----------------------------------------------------
 # 2. Registro de Usuario (OPCIONAL, pero útil)
 # ----------------------------------------------------
