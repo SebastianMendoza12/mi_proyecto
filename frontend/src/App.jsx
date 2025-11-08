@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Inicio from "./pages/Inicio";
 // import MiCuenta from "./pages/MiCuenta";
 
 function App() {
@@ -11,6 +12,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/buscar" element={<Buscar />} />
+          <Route path="/" element={<Inicio />} />
           {/* <Route path="/mi-cuenta" element={<MiCuenta />} /> */}
         </Routes>
     </Router>

@@ -1,0 +1,91 @@
+.dashboard-container {
+  display: flex;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+.sidebar {
+  width: 220px;
+  background-color: #161623;
+  color: white;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  margin-bottom: 20px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  margin: 15px 0;
+}
+
+.sidebar a {
+  text-decoration: none;
+  color: white;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #b5b5b5;
+  padding: 10px 20px;
+}
+
+.search-bar {
+  width: 40%;
+  padding: 6px;
+  border: none;
+  border-radius: 5px;
+}
+
+.logout-btn {
+  background-color: #b50000;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+}
+
+.dashboard-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-content {
+  padding: 20px;
+}
+
+.card-panel {
+  background-color: #c2b9b9;
+  margin-bottom: 20px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  background-color: #151515;
+  color: white;
+  padding: 8px;
+}
+
+.actions button {
+  margin-left: 5px;
+  background-color: #292929;
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.acciones-recientes {
+  background-color: #aaa2a2;
+  padding: 10px;
+  width: 40%;
+}

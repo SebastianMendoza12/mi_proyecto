@@ -102,4 +102,19 @@ export const logout = () => {
   localStorage.removeItem("refresh_token");
 };
 
+
+// ========== PRODUCTOS ==========
+export const getProductos = (params = {}) => api.get("/api/productos/", { params });
+
+export const getProducto = (id) => api.get(`/api/productos/${id}/`);
+
+export const createProducto = (data) => api.post("/api/productos/", data); // Solo admin
+
+export const updateProducto = (id, data) => api.put(`/api/productos/${id}/`, data); // Solo admin
+
+export const deleteProducto = (id) => api.delete(`/api/productos/${id}/`); // Solo admin
+
+export const calificarProducto = (id, calificacion) =>
+  api.post(`/api/productos/${id}/calificar/`, { calificacion });
+
 export default api;
