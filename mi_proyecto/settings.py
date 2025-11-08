@@ -14,7 +14,7 @@ SECRET_KEY = config("SECRET_KEY", default="django-insecure-abc123xyz789-change-t
 DEBUG = config("DEBUG", default=False, cast=bool)
 
 # ALLOWED_HOSTS - Soporta múltiples hosts separados por coma
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1").split(",")
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1,fastfood-fapu.onrender.com").split(",")
 ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS]  # Limpia espacios
 
 # Application definition
@@ -30,11 +30,12 @@ INSTALLED_APPS = [
     "django_filters",
     "usuarios",
     "productos",
+    "administracion",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "corsheaders.middleware.CorsMiddleware",  # DEBE estar antes de CommonMiddleware
+    "corsheaders.middleware.CorsMiddleware", 
     "django.middleware.common.CommonMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -47,7 +48,7 @@ MIDDLEWARE = [
 # CORS Configuration
 CORS_ALLOWED_ORIGINS = config(
     "CORS_ALLOWED_ORIGINS",
-    default="http://localhost:5173,http://localhost:3000"
+    default="http://localhost:5173,http://localhost:3000,https://mi-proyecto-amber-delta.vercel.app"
 ).split(",")
 CORS_ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ALLOWED_ORIGINS]  # Limpia espacios
 
