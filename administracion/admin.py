@@ -51,16 +51,26 @@ class VentaAdmin(admin.ModelAdmin):
 
 @admin.register(CustomUser)
 class CustomUserAdmin(BaseUserAdmin):
-    # Definimos qué campos se muestran en la lista
+    # Campos que se muestran en la lista (esto ya estaba bien)
     list_display = ('email', 'is_staff', 'is_active', 'date_joined')
     search_fields = ('email',)
     ordering = ('email',)
     
-    # Definimos los campos que se ven en el formulario de edición/creación
+    # FIX CRÍTICO: Definimos la estructura del formulario de ADICIÓN/EDICIÓN
+    # Quitamos 'username' de todos los fieldsets y lo reemplazamos por 'email'.
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
+        (None, {'fields': ('email', 'password')}), # <-- Cambiado de ('username', 'password')
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
-    # Excluye 'username' si usaste email como identificador
+    
+    # Definimos qué campos se muestran en la pantalla de CREACIÓN de nuevo usuario
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'password', 'password2'), # <-- Usamos email para crear
+        }),
+    )
+
+    # Excluye 'username' (aunque con el add_fieldsets ya no es tan necesario)
     exclude = ('username',)
