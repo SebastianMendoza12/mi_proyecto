@@ -1,6 +1,4 @@
-"""
-Django settings for mi_proyecto project.
-"""
+
 import os
 from pathlib import Path
 from decouple import config
@@ -13,8 +11,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY
 SECRET_KEY = config("SECRET_KEY", default="django-insecure-abc123xyz789-change-this")
-DEBUG = config("DEBUG", default=True, cast=bool)
+DEBUG = config("DEBUG", default=False, cast=bool)
+
+# ALLOWED_HOSTS - Soporta múltiples hosts separados por coma
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1").split(",")
+ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS]  # Limpia espacios
 
 # Application definition
 INSTALLED_APPS = [
@@ -33,7 +34,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",  # DEBE estar antes de CommonMiddleware
     "django.middleware.common.CommonMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -43,10 +44,26 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+# CORS Configuration
 CORS_ALLOWED_ORIGINS = config(
     "CORS_ALLOWED_ORIGINS",
     default="http://localhost:5173,http://localhost:3000"
 ).split(",")
+CORS_ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ALLOWED_ORIGINS]  # Limpia espacios
+
+# Configuración adicional de CORS para producción
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
 ROOT_URLCONF = 'mi_proyecto.urls'
 
@@ -67,7 +84,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'mi_proyecto.wsgi.application'
 
-# Database - FIX: Maneja SQLite y PostgreSQL correctamente
+# Database - Configuración mejorada para Neon
 DATABASE_URL = config("DATABASE_URL", default="sqlite:///db.sqlite3")
 
 if DATABASE_URL.startswith("sqlite"):
@@ -79,14 +96,22 @@ if DATABASE_URL.startswith("sqlite"):
         }
     }
 else:
-    # PostgreSQL (producción en Render)
+    # PostgreSQL (Neon u otros servicios)
     DATABASES = {
         'default': dj_database_url.config(
             default=DATABASE_URL,
             conn_max_age=600,
+            conn_health_checks=True,
             ssl_require=True
         )
     }
+    
+    # Fix para Neon: Configurar SSL correctamente
+    db_options = DATABASES['default'].get('OPTIONS', {})
+    db_options['sslmode'] = 'require'
+    # Eliminar channel_binding si existe
+    db_options.pop('channel_binding', None)
+    DATABASES['default']['OPTIONS'] = db_options
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -113,6 +138,11 @@ USE_TZ = True
 # Static files
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # Default auto field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -134,3 +164,12 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 12,
 }
+
+# Security settings for production
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
