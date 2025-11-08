@@ -1,4 +1,3 @@
-import Sidebar from "../components/sidebar";
 import Navbar from "../components/navbar";
 import CardPanel from "../components/cardpanel";
 import "./../styles/admin.css";
@@ -6,7 +5,7 @@ import "./../styles/admin.css";
 export default function Inicio() {
   return (
     <div className="dashboard-container">
-      <Sidebar />
+      
       <main className="dashboard-main">
         <Navbar />
         <section className="dashboard-content">
