@@ -62,6 +62,24 @@ DATABASES = {
     )
 }
 
+# mi_proyecto/settings.py
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        # DIRS debe incluir la ruta base del proyecto de forma explícita o estar vacío para proyectos con APP_DIRS=True
+        'DIRS': [BASE_DIR / 'templates'], 
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
 
 # ----------------- SEGURIDAD, USUARIOS Y DRF -----------------
 
