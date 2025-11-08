@@ -12,7 +12,6 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/buscar" element={<Buscar />} />
-          <Route path="/" element={<Home />} />
           {/* <Route path="/mi-cuenta" element={<MiCuenta />} /> */}
         </Routes>
     </Router>
