@@ -55,10 +55,11 @@ WSGI_APPLICATION = 'mi_proyecto.wsgi.application'
 # ----------------- BASE DE DATOS -----------------
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=config("DATABASE_URL"), 
+        conn_max_age=600,
+        # La configuración de SSL se mantiene eliminada o comentada para el desarrollo local.
+    )
 }
 
 # mi_proyecto/settings.py
