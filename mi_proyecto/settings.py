@@ -10,7 +10,7 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config("SECRET_KEY")
 DEBUG = True
-ALLOWED_HOSTS = ['mi-proyecto-h98i.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['mi-proyecto-6tvh.onrender.com', 'localhost', '127.0.0.1']
 
 
 # ----------------- APLICACIONES Y MIDDLEWARE -----------------
