@@ -1,6 +1,10 @@
 import { useState } from "react";
-import { registerUser } from "../services/api";  // Asumiendo que api.js tiene registerUser con Axios
+import { useNavigate } from "react-router-dom";
+//import { registerUser } from "../services/api"; 
+import axios from "axios";
 import logo from "../assets/LogotipoProyecto.png";
+
+const API_BASE = import.meta.env.VITE_API_URL || "https://fastfood-fapu.onrender.com";
 
 function Register() {
   const [username, setUsername] = useState("");
@@ -9,6 +13,7 @@ function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const checkPasswordStrength = (pass) => {
     if (!pass) return { level: 0, text: "", color: "", bgColor: "", width: "0%" };
@@ -58,69 +63,64 @@ function Register() {
   };
 
   const passwordStrength = checkPasswordStrength(password);
-
-  // Validar que las contraseñas coincidan
   const passwordsMatch = password && confirmPassword && password === confirmPassword;
   const showPasswordMismatch = confirmPassword && password !== confirmPassword;
+
+  const formatTelefono = (value) => {
+    const cleaned = value.replace(/\D/g, '');
+    if (cleaned.length <= 3) return cleaned;
+    if (cleaned.length <= 6) return `${cleaned.slice(0, 3)}-${cleaned.slice(3)}`;
+    return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6, 10)}`;
+  };
+  const handleTelefonoChange = (e) => {
+    const formatted = formatTelefono(e.target.value);
+    setTelefono(formatted);
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
     setMessage(null);
-    if (password !== confirmPassword) {setMessage({ text: "❌ Las contraseñas no coinciden", type: "error" });
+    if (password !== confirmPassword) {setMessage({ text: "Las contraseñas no coinciden", type: "error" });
+      return;
+    }
+    const telefonoLimpio = telefono.replace(/\D/g, '');
+    if (telefonoLimpio.length < 10) {
+      setMessage({ text: "Número de teléfono inválido", type: "error" });
       return;
     }
     setLoading(true);
 
-    // Limpieza automática: Remueve tokens viejos antes de register (evita "expired")
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token"); 
-
     try {
-      await registerUser({ username, password });
-      setMessage({ text: "✅ Usuario creado exitosamente. Ahora puedes iniciar sesión.", type: "success" });
-      setUsername("");
-      setPassword("");
-      setConfirmPassword("");
+      const res = await axios.post(`${API_BASE}/api/auth/register/`, { 
+        username, 
+        password,
+        telefono: telefonoLimpio
+      });
+      if (res.data.requiere_verificacion) {
+        navigate("/verify-code", { 
+          state: { 
+            userId: res.data.user_id,
+            telefono: telefonoLimpio
+          } 
+        });
+      }
+
     } catch (err) {
       const status = err.response?.status;
-      const errorDetail = err.response?.data?.detail || err.response?.data?.error || err.message || "";
+      const errorDetail = err.response?.data?.error || err.message || "";
+      let errorText = "Error al registrar usuario";
 
-      let errorText = "❌ Error al registrar usuario. Inténtalo de nuevo.";
-
-      // 1. Verificar PRIMERO si el usuario ya existe 
       if (errorDetail.toLowerCase().includes("already exists") || 
           errorDetail.toLowerCase().includes("ya existe") ||
-          errorDetail.toLowerCase().includes("taken") || 
-          errorDetail.toLowerCase().includes("duplicate") ||
           status === 409) {
-        errorText = "❌ El usuario ya existe. Elige otro nombre.";
-      }
-      // 2. Validar contraseña débil 
-      else if (errorDetail.toLowerCase().includes("password") && 
-          (errorDetail.toLowerCase().includes("weak") || 
-          errorDetail.toLowerCase().includes("débil") ||
-          errorDetail.toLowerCase().includes("debe contener"))) {
-        errorText = "❌ La contraseña no cumple los requisitos de seguridad.";
-      }
-      // 3. Errores de autenticación
-      else if (status === 401 || 
-          errorDetail.includes("Token is expired") || 
-          errorDetail.includes("unauthorized") || 
-          errorDetail.includes("authentication")) {
-        errorText = "❌ Error temporal en la autenticación. Limpia la caché e inténtalo de nuevo.";
-        localStorage.clear();
-      }
-      // 4. Errores de red
-      else if (errorDetail.includes("network") || !err.response) {
-        errorText = "❌ Error de conexión. Verifica tu internet e inténtalo de nuevo.";
-      } 
-      // 5. Error genérico 400 (solo si no coincidió nada anterior)
-      else if (status === 400) {
-        errorText = `❌ ${errorDetail || "Datos inválidos. Verifica la información."}`;
-      }
-      // 6. Otros errores
-      else {
-        errorText = `❌ ${errorDetail || "Ocurrió un error inesperado. Contacta soporte."}`;
+        errorText = "El usuario ya existe. Elige otro nombre";
+      } else if (errorDetail.toLowerCase().includes("password") && 
+                 errorDetail.toLowerCase().includes("débil")) {
+        errorText = "La contraseña no cumple los requisitos de seguridad";
+      } else if (!err.response) {
+        errorText = "Error de conexión. Verifica tu internet";
+      } else {
+        errorText = errorDetail || "Ocurrió un error inesperado";
       }
 
       setMessage({ text: errorText, type: "error" });
@@ -135,11 +135,7 @@ function Register() {
       {/* Lado Izquierdo - Logo con fondo crema/beige */}
       <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-12" style={{ backgroundColor: "#FDFED6" }}>
         <div className="flex items-center justify-center w-full h-full">
-          <img
-            src={logo}
-            alt="FastFood.exe Logo"
-            className="max-w-md w-full h-auto object-contain"
-          />
+          <img src={logo} alt="FastFood.exe Logo" className="max-w-md w-full h-auto object-contain" />
         </div>
       </div>
 
@@ -162,6 +158,19 @@ function Register() {
                 placeholder="Usuario"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                required
+                className="w-full px-6 py-4 rounded-lg border-2 border-gray-300 focus:border-gray-400 focus:outline-none transition-all duration-200 text-gray-700 placeholder-gray-400"
+              />
+            </div>
+
+            {/* Input Telefono */}
+            <div style={{ marginBottom: '1.5rem' }}>
+              <input
+                type="tel"
+                placeholder="Teléfono (301-234-5678)"
+                value={telefono}
+                onChange={handleTelefonoChange}
+                maxLength={12}
                 required
                 className="w-full px-6 py-4 rounded-lg border-2 border-gray-300 focus:border-gray-400 focus:outline-none transition-all duration-200 text-gray-700 placeholder-gray-400"
               />

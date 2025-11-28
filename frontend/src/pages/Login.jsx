@@ -1,12 +1,17 @@
 import { useState } from "react";
-import { loginUser  } from "../services/api";
+import { useNavigate } from "react-router-dom";
+//import { loginUser  } from "../services/api";
+import axios from "axios";
 import logo from "../assets/LogotipoProyecto.png";
+
+const API_BASE = import.meta.env.VITE_API_URL || "https://fastfood-fapu.onrender.com";
 
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -14,27 +19,35 @@ function Login() {
     setLoading(true);
 
     try {
-      const res = await loginUser ({ username, password });
-      setMessage({ text: "✅ Inicio de sesión exitoso", type: "success" });
-      localStorage.setItem("username", username);
-      console.log("Token:", res.data);
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 1000);
+      const res = await axios.post(`${API_BASE}/api/auth/login/`, { 
+        username, 
+        password 
+      });
+      if (res.data.requiere_verificacion) {
+        navigate("/verify-code", { 
+          state: { 
+            userId: res.data.user_id,
+            telefono: res.data.telefono || ""
+          } 
+        });
+      } else {
+        localStorage.setItem("access_token", res.data.access);
+        localStorage.setItem("refresh_token", res.data.refresh);
+        localStorage.setItem("username", username);
+        setMessage({ text: "Inicio de sesión exitoso", type: "success" });
+        setTimeout(() => navigate("/"), 1000);
+      }
       
     } catch (err) {
-      const errorDetail = err.response?.data?.detail || err.response?.data?.error || "";
-      let errorText = "❌ Error al iniciar sesión";
+      const errorDetail = err.response?.data?.error || "";
+      let errorText = "Error al iniciar sesión";
       
-      
-      if (errorDetail.includes("No active account") || errorDetail.includes("credentials") || errorDetail.includes("invalid")) {
-        errorText = "❌ Usuario o contraseña incorrectos. Inténtalo de nuevo";
-      } else if (errorDetail.includes("network") || !err.response) {
-        errorText = "❌ Error de conexión. Verifica tu internet e inténtalo de nuevo";
-      } else if (errorDetail.includes("inactive")) {
-        errorText = "❌ Cuenta inactiva. Contacta al administrador";
+      if (errorDetail.includes("Credenciales incorrectas")) {
+        errorText = "Usuario o contraseña incorrectos";
+      } else if (!err.response) {
+        errorText = "Error de conexión. Verifica tu internet";
       } else {
-        errorText = `❌ ${errorDetail || "Ocurrió un error inesperado"}`;  
+        errorText = errorDetail || "Ocurrió un error inesperado";
       }
       
       setMessage({ text: errorText, type: "error" });
@@ -49,11 +62,7 @@ function Login() {
       {/* Lado Izquierdo - Logo con fondo crema/beige */}
       <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-12" style={{ backgroundColor: '#FDFED6' }}>
         <div className="flex items-center justify-center w-full h-full">
-          <img
-            src={logo}
-            alt="FastFood.exe Logo"
-            className="max-w-md w-full h-auto object-contain"
-          />
+          <img src={logo} alt="FastFood.exe Logo" className="max-w-md w-full h-auto object-contain" />
         </div>
       </div>
 
@@ -114,9 +123,7 @@ function Login() {
                     : "bg-green-50 border-green-300 text-green-800"
                 }`}
               >
-                <p className="text-sm font-medium text-center">
-                  {message.text}
-                </p>
+                <p className="text-sm font-medium text-center"> {message.text} </p>
               </div>
             )}
           </form>
