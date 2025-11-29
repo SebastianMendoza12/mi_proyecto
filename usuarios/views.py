@@ -7,7 +7,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils import timezone
 import re
 from .models import CodigoVerificacion
-from .utils import enviar_codigo_sms
+from .utils import enviar_codigo_email
 
 User = get_user_model()
 
@@ -16,12 +16,14 @@ class RegisterView(APIView):
     def post(self, request):
         username = request.data.get("username")
         password = request.data.get("password")
-        telefono = request.data.get("telefono")
-        if not username or not password or not telefono:
-            return Response({"error": "Usuario, contraseña y teléfono son requeridos"}, status=status.HTTP_400_BAD_REQUEST)
+        email = request.data.get("email")
+        if not username or not password or not email:
+            return Response({"error": "Usuario, contraseña y email son requeridos"}, status=status.HTTP_400_BAD_REQUEST)
         if User.objects.filter(username=username).exists():
             return Response({"error": "Usuario ya existe"}, status=status.HTTP_400_BAD_REQUEST)
-        
+        if User.objects.filter(email=email).exists():
+            return Response({"error": "Email ya registrado"}, status=status.HTTP_400_BAD_REQUEST)
+
         password_errors = []
         if len(password) < 8:
             password_errors.append("La contraseña debe tener al menos 8 caracteres")
@@ -36,17 +38,14 @@ class RegisterView(APIView):
         if password_errors:
             return Response({"error": "Contraseña débil: " + ", ".join(password_errors)}, status=status.HTTP_400_BAD_REQUEST)
         
-        telefono_limpio = re.sub(r'\D', '', telefono)
-        if len(telefono_limpio) < 10:
-            return Response({"error": "Número de teléfono inválido"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        user = User.objects.create_user(username=username, password=password, telefono=telefono)
+        user = User.objects.create_user(username=username, password=password, email=email)
         codigo = CodigoVerificacion.objects.create(usuario=user,tipo='registro')
-        enviar_codigo_sms(telefono, codigo.codigo)
+        enviar_codigo_email(email, codigo.codigo)
         
-        return Response({"message": "Usuario creado. Se ha enviado un código de verificación a tu teléfono",
+        return Response({"message": "Usuario creado. Se ha enviado un código de verificación a tu email",
                          "user_id": user.id,
-                        "requiere_verificacion": True
+                         "email": email,
+                         "requiere_verificacion": True
                         }, status=status.HTTP_201_CREATED)
 
 class LoginView(APIView):
@@ -71,9 +70,9 @@ class LoginView(APIView):
             )
         
         if not user.verificado_2fa:
-            if not user.telefono:
+            if not user.email:
                 return Response(
-                    {"error": "Usuario sin teléfono configurado"}, 
+                    {"error": "Usuario sin email configurado"}, 
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
@@ -82,11 +81,12 @@ class LoginView(APIView):
                 tipo='login'
             )
             
-            enviar_codigo_sms(user.telefono, codigo.codigo)
+            enviar_codigo_email(user.email, codigo.codigo)
             
             return Response({
-                "message": "Se ha enviado un código de verificación a tu teléfono",
+                "message": "Se ha enviado un código de verificación a tu email",
                 "user_id": user.id,
+                "email": user.email,
                 "requiere_verificacion": True
             }, status=status.HTTP_200_OK)
         
@@ -176,9 +176,9 @@ class ReenviarCodigoView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
         
-        if not user.telefono:
+        if not user.email:
             return Response(
-                {"error": "Usuario sin teléfono configurado"}, 
+                {"error": "Usuario sin email configurado"}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -192,7 +192,7 @@ class ReenviarCodigoView(APIView):
             tipo='login'
         )
         
-        enviar_codigo_sms(user.telefono, codigo.codigo)
+        enviar_codigo_email(user.email, codigo.codigo)
         
         return Response({
             "message": "Código reenviado exitosamente"

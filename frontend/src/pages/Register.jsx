@@ -1,14 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-//import { registerUser } from "../services/api"; 
-import axios from "axios";
+import { registerUser } from "../services/api"; 
 import logo from "../assets/LogotipoProyecto.png";
-
-const API_BASE = import.meta.env.VITE_API_URL || "https://fastfood-fapu.onrender.com";
 
 function Register() {
   const [username, setUsername] = useState("");
-  const [telefono, setTelefono] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState(null);
@@ -66,41 +63,22 @@ function Register() {
   const passwordsMatch = password && confirmPassword && password === confirmPassword;
   const showPasswordMismatch = confirmPassword && password !== confirmPassword;
 
-  const formatTelefono = (value) => {
-    const cleaned = value.replace(/\D/g, '');
-    if (cleaned.length <= 3) return cleaned;
-    if (cleaned.length <= 6) return `${cleaned.slice(0, 3)}-${cleaned.slice(3)}`;
-    return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6, 10)}`;
-  };
-  const handleTelefonoChange = (e) => {
-    const formatted = formatTelefono(e.target.value);
-    setTelefono(formatted);
-  };
-
   const handleRegister = async (e) => {
     e.preventDefault();
     setMessage(null);
     if (password !== confirmPassword) {setMessage({ text: "Las contraseñas no coinciden", type: "error" });
       return;
     }
-    const telefonoLimpio = telefono.replace(/\D/g, '');
-    if (telefonoLimpio.length < 10) {
-      setMessage({ text: "Número de teléfono inválido", type: "error" });
-      return;
-    }
+  
     setLoading(true);
 
     try {
-      const res = await axios.post(`${API_BASE}/api/auth/register/`, { 
-        username, 
-        password,
-        telefono: telefonoLimpio
-      });
+      const res = await registerUser({ username, password, email });
       if (res.data.requiere_verificacion) {
         navigate("/verify-code", { 
           state: { 
             userId: res.data.user_id,
-            telefono: telefonoLimpio
+            email: res.data.email
           } 
         });
       }
@@ -114,6 +92,8 @@ function Register() {
           errorDetail.toLowerCase().includes("ya existe") ||
           status === 409) {
         errorText = "El usuario ya existe. Elige otro nombre";
+      } else if (errorDetail.toLowerCase().includes("email")) {
+        errorText = "Email ya registrado";
       } else if (errorDetail.toLowerCase().includes("password") && 
                  errorDetail.toLowerCase().includes("débil")) {
         errorText = "La contraseña no cumple los requisitos de seguridad";
@@ -163,14 +143,13 @@ function Register() {
               />
             </div>
 
-            {/* Input Telefono */}
+            {/* Input Email */}
             <div style={{ marginBottom: '1.5rem' }}>
               <input
-                type="tel"
-                placeholder="Teléfono"
-                value={telefono}
-                onChange={handleTelefonoChange}
-                maxLength={12}
+                type="email"
+                placeholder="Correo electrónico"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 className="w-full px-6 py-4 rounded-lg border-2 border-gray-300 focus:border-gray-400 focus:outline-none transition-all duration-200 text-gray-700 placeholder-gray-400"
               />

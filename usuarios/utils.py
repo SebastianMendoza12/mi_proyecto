@@ -1,48 +1,39 @@
-from twilio.rest import Client
+from django.core.mail import send_mail
 from django.conf import settings
-import os
 
-def enviar_codigo_sms(telefono, codigo):
+def enviar_codigo_email(email, codigo):
     """
-    Envía un código de verificación por SMS usando Twilio
-    
-    Args:
-        telefono (str): Número de teléfono en formato +57XXXXXXXXXX
-        codigo (str): Código de 6 dígitos a enviar
-    
-    Returns:
-        bool: True si se envió correctamente, False en caso contrario
+    Envía un código de verificación por email
+    Completamente GRATIS usando el servidor SMTP de Django
     """
     try:
-        account_sid = os.getenv('TWILIO_ACCOUNT_SID')
-        auth_token = os.getenv('TWILIO_AUTH_TOKEN')
-        twilio_phone = os.getenv('TWILIO_PHONE_NUMBER')
+        asunto = 'Código de Verificación - FastFood.exe'
         
-        # Si no está configurado Twilio, imprimir código en consola (modo desarrollo)
-        if not all([account_sid, auth_token, twilio_phone]):
-            print("=" * 50)
-            print("TWILIO NO CONFIGURADO - MODO DESARROLLO")
-            print(f"Código de verificación para {telefono}: {codigo}")
-            print("=" * 50)
-            return False
+        mensaje = f"""
+Hola,
+
+Tu código de verificación es: {codigo}
+
+Este código es válido por 10 minutos.
+
+Si no solicitaste este código, ignora este mensaje.
+
+Saludos,
+Equipo FastFood.exe
+        """
         
-        # Crear cliente de Twilio
-        client = Client(account_sid, auth_token)
-        
-        # Mensaje a enviar
-        mensaje = f"Tu código de verificación para FastFood.exe es: {codigo}\n\nVálido por 10 minutos."
-        
-        # Enviar SMS
-        message = client.messages.create(
-            body=mensaje,
-            from_=twilio_phone,
-            to=telefono
+        send_mail(
+            asunto,
+            mensaje,
+            settings.DEFAULT_FROM_EMAIL,
+            [email],
+            fail_silently=False,
         )
         
-        print(f"SMS enviado exitosamente a {telefono}. SID: {message.sid}")
+        print(f"Email enviado exitosamente a {email}")
         return True
         
     except Exception as e:
-        print(f"Error al enviar SMS: {str(e)}")
-        print(f"MODO DEBUG: Código de verificación para {telefono}: {codigo}")
+        print(f"Error al enviar email: {str(e)}")
+        print(f"MODO DEBUG: Código de verificación para {email}: {codigo}")
         return False
