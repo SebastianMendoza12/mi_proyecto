@@ -7,6 +7,7 @@ import string
 
 class CustomUser(AbstractUser):
     telefono = models.CharField(max_length=20, blank=True, null=True)
+    email = models.EmailField(unique=True, blank=False, null=False)
     rol = models.CharField(max_length=20, choices=[("admin", "Admin"), ("cliente", "Cliente")], default="cliente")
     verificado_2fa = models.BooleanField(default=False)
 

@@ -14,7 +14,7 @@ export default function VerifyCode() {
   
   const inputRefs = useRef([]);
   const userId = location.state?.userId;
-  const telefono = location.state?.telefono || "";
+  const email = location.state?.email || "";
 
   useEffect(() => {
     if (!userId) {
@@ -82,7 +82,7 @@ export default function VerifyCode() {
         localStorage.setItem("username", res.data.username);
       }
       
-      setMessage({ text: "Verificación exitosa", type: "success" });
+      setMessage({ text: "✓ Verificación exitosa", type: "success" });
       setTimeout(() => navigate("/"), 1000);
       
     } catch (err) {
@@ -101,8 +101,15 @@ export default function VerifyCode() {
     setMessage(null);
 
     try {
-      await reenviarCodigo({ user_id: userId });
-      setMessage({ text: "Código reenviado exitosamente", type: "success" });
+      const res = await reenviarCodigo({ user_id: userId });
+      
+      // Mostrar código en desarrollo si está disponible
+      if (res.data.codigo_debug) {
+        console.log("🔐 CÓDIGO REENVIADO:", res.data.codigo_debug);
+        alert(`⚠️ MODO DESARROLLO\nCódigo: ${res.data.codigo_debug}\n\n(En producción llegará por email)`);
+      }
+      
+      setMessage({ text: "✓ Código reenviado. Revisa tu email", type: "success" });
     } catch (err) {
       setMessage({ text: "Error al reenviar el código", type: "error" });
       setResendDisabled(false);
@@ -110,7 +117,7 @@ export default function VerifyCode() {
     }
   };
 
-  const telefonoMasked = telefono.replace(/(\d{3})(\d{3})(\d{4})/, "***-***-$3");
+  const emailMasked = email.replace(/(.{3})(.*)(@.*)/, "$1***$3");
 
   return (
     <div className="min-h-screen bg-white flex w-full">
@@ -128,7 +135,10 @@ export default function VerifyCode() {
             </h1>
             <p className="text-gray-600">
               Introduce el código de 6 dígitos enviado a<br />
-              <span className="font-semibold">{telefonoMasked}</span>
+              <span className="font-semibold">📧 {emailMasked}</span>
+            </p>
+            <p className="text-sm text-gray-500 mt-2">
+              Revisa tu bandeja de entrada o spam
             </p>
           </div>
 
