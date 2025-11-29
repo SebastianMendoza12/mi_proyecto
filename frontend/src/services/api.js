@@ -12,7 +12,7 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // Lista de rutas que NO necesitan token
-    const publicRoutes = ['/api/auth/register/', '/api/login/'];
+    const publicRoutes = ['/api/auth/register/', '/api/login/', '/api/login/'];
     const isPublicRoute = publicRoutes.some(route => config.url?.includes(route));
     
     // Solo agrega el token si NO es una ruta pública
@@ -50,7 +50,7 @@ api.interceptors.response.use(
     const originalRequest = error.config;
     if (!originalRequest) return Promise.reject(error);
     // Lista de rutas públicas que NO deben intentar refrescar token
-    const publicRoutes = ['/api/auth/register/', '/api/login/'];
+    const publicRoutes = ['/api/auth/register/', '/api/auth/login/', '/api/login/'];
     const isPublicRoute = publicRoutes.some(route => originalRequest.url?.includes(route));
 
     // Si es ruta pública, no intentar refrescar token
@@ -106,7 +106,7 @@ api.interceptors.response.use(
 export const registerUser = (payload) => api.post("/api/auth/register/", payload);
 export const loginUser = async (payload) => {
   // La vista TokenObtainPair devuelve { access, refresh }
-  const res = await api.post("/api/login/", payload);
+  const res = await api.post("/api/auth/login/", payload);
   if (res.data.access) localStorage.setItem("access_token", res.data.access);
   if (res.data.refresh) localStorage.setItem("refresh_token", res.data.refresh);
   return res;
@@ -115,8 +115,12 @@ export const loginUser = async (payload) => {
 export const logout = () => {
   localStorage.removeItem("access_token");
   localStorage.removeItem("refresh_token");
+  localStorage.removeItem("username");
 };
 
+export const verificarCodigo = (data) => api.post("/api/auth/verificar-codigo/", data);
+
+export const reenviarCodigo = (data) => api.post("/api/auth/reenviar-codigo/", data);
 
 // ========== PRODUCTOS ==========
 export const getProductos = (params = {}) => api.get("/api/productos/", { params });
