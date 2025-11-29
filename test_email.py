@@ -19,7 +19,7 @@ try:
         subject='Prueba de FastFood.exe',
         message='Este es un mensaje de prueba. Tu configuración funciona!',
         from_email=settings.EMAIL_HOST_USER,
-        recipient_list=['tu_email_personal@gmail.com'],  # Cambia esto por tu email
+        recipient_list=['sebas1093432545@gmail.com'],  # Cambia esto por tu email
         fail_silently=False,
     )
     print("✅ Email enviado exitosamente!")
