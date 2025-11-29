@@ -19,7 +19,10 @@ from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.routers import DefaultRouter
 from administracion.views import ProductoAdminViewSet, VentaAdminViewSet
-from usuarios.views import RegisterView
+
+router_admin = DefaultRouter()
+router_admin.register(r'productos', ProductoAdminViewSet, basename='admin-producto')
+router_admin.register(r'ventas', VentaAdminViewSet, basename='admin-venta')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
