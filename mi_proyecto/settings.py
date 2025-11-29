@@ -14,7 +14,7 @@ SECRET_KEY = config("SECRET_KEY", default="django-insecure-abc123xyz789-change-t
 DEBUG = config("DEBUG", default=False, cast=bool)
 
 # ALLOWED_HOSTS - Soporta múltiples hosts separados por coma
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1,fastfood-fapu.onrender.com").split(",")
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1,fastfood-fapu.onrender.com,mi-proyecto-amber-delta.vercel.app").split(",")
 ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS]  # Limpia espacios
 
 # Application definition
@@ -103,16 +103,15 @@ else:
             default=DATABASE_URL,
             conn_max_age=600,
             conn_health_checks=True,
-            ssl_require=True
         )
     }
     
-    # Fix para Neon: Configurar SSL correctamente
-    db_options = DATABASES['default'].get('OPTIONS', {})
-    db_options['sslmode'] = 'require'
-    # Eliminar channel_binding si existe
-    db_options.pop('channel_binding', None)
-    DATABASES['default']['OPTIONS'] = db_options
+    # Configuración SSL para Neon
+    if 'OPTIONS' not in DATABASES['default']:
+        DATABASES['default']['OPTIONS'] = {}
+    DATABASES['default']['OPTIONS']['sslmode'] = 'require'
+    # Limpiar parámetros problemáticos si existen
+    DATABASES['default']['OPTIONS'].pop('channel_binding', None)
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -181,10 +180,10 @@ if not DEBUG:
     X_FRAME_OPTIONS = 'DENY'
 
 # Configuración de Email
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = config('EMAIL_HOST_USER', default='noreply@fastfood.com')
