@@ -27,7 +27,7 @@ function Login() {
         navigate("/verify-code", { 
           state: { 
             userId: res.data.user_id,
-            telefono: res.data.telefono || ""
+            email: res.data.email || ""
           } 
         });
       } else {

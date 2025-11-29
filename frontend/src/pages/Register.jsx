@@ -167,7 +167,7 @@ function Register() {
             <div style={{ marginBottom: '1.5rem' }}>
               <input
                 type="tel"
-                placeholder="Teléfono (301-234-5678)"
+                placeholder="Teléfono"
                 value={telefono}
                 onChange={handleTelefonoChange}
                 maxLength={12}
