@@ -4,7 +4,6 @@ from rest_framework.permissions import AllowAny
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.utils import timezone
 import re
 import logging
 from .models import CodigoVerificacion
@@ -68,50 +67,26 @@ class RegisterView(APIView):
             logger.info(f"Usuario creado exitosamente: {user.id}")
             
             # Crear código de verificación
-            logger.info(f"Generando código de verificación para: {user.id}")
             codigo = CodigoVerificacion.objects.create(usuario=user, tipo='registro')
             logger.info(f"Código generado: {codigo.codigo}")
             
-            # Intentar enviar email (con timeout corto para no bloquear)
-            email_enviado = False
-            try:
-                import signal
-                
-                def timeout_handler(signum, frame):
-                    raise TimeoutError("Email timeout")
-                
-                # Configurar timeout de 5 segundos
-                signal.signal(signal.SIGALRM, timeout_handler)
-                signal.alarm(5)
-                
-                try:
-                    email_enviado = enviar_codigo_email(email, codigo.codigo)
-                    signal.alarm(0)  # Cancelar alarma
-                except TimeoutError:
-                    signal.alarm(0)
-                    logger.warning(f"Timeout al enviar email a: {email}")
-                    email_enviado = False
-                    
-            except Exception as email_error:
-                logger.error(f"Error al enviar email: {str(email_error)}")
+            # Enviar email en segundo plano (no bloquea la respuesta)
+            enviar_codigo_email(email, codigo.codigo)
             
-            # SIEMPRE mostrar el código en los logs (temporal para producción)
-            logger.warning(f"🔑 CÓDIGO DE VERIFICACIÓN PARA {email}: {codigo.codigo}")
+            # Log del código (se verá en los logs de Render)
+            logger.warning(f"🔑 CÓDIGO PARA {email}: {codigo.codigo}")
             
             return Response({
-                "message": "Usuario creado exitosamente. Revisa tu email o contacta con soporte para obtener tu código.",
+                "message": "Usuario creado exitosamente. Revisa tu email.",
                 "user_id": user.id,
                 "email": email,
-                "requiere_verificacion": True,
-                # En producción sin email funcionando, devolver el código directamente
-                "codigo": codigo.codigo,
-                "nota": "Temporal: El código se muestra aquí porque el email no está configurado"
+                "requiere_verificacion": True
             }, status=status.HTTP_201_CREATED)
             
         except Exception as e:
             logger.error(f"Error en registro: {str(e)}", exc_info=True)
             return Response(
-                {"error": f"Error interno del servidor: {str(e)}"}, 
+                {"error": "Error interno del servidor"}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -124,8 +99,6 @@ class LoginView(APIView):
             username = request.data.get("username")
             password = request.data.get("password")
             
-            logger.info(f"Intento de login: username={username}")
-            
             if not username or not password:
                 return Response(
                     {"error": "Usuario y contraseña son requeridos"}, 
@@ -135,13 +108,10 @@ class LoginView(APIView):
             user = authenticate(username=username, password=password)
             
             if not user:
-                logger.warning(f"Credenciales incorrectas para: {username}")
                 return Response(
                     {"error": "Credenciales incorrectas"}, 
                     status=status.HTTP_401_UNAUTHORIZED
                 )
-            
-            logger.info(f"Usuario autenticado: {user.id}, verificado_2fa: {user.verificado_2fa}")
             
             if not user.verificado_2fa:
                 if not user.email:
@@ -151,45 +121,22 @@ class LoginView(APIView):
                     )
                 
                 # Crear código de verificación
-                logger.info(f"Generando código 2FA para: {user.id}")
                 codigo = CodigoVerificacion.objects.create(usuario=user, tipo='login')
                 
-                # Intentar enviar email (con timeout)
-                email_enviado = False
-                try:
-                    import signal
-                    
-                    def timeout_handler(signum, frame):
-                        raise TimeoutError("Email timeout")
-                    
-                    signal.signal(signal.SIGALRM, timeout_handler)
-                    signal.alarm(5)
-                    
-                    try:
-                        email_enviado = enviar_codigo_email(user.email, codigo.codigo)
-                        signal.alarm(0)
-                    except TimeoutError:
-                        signal.alarm(0)
-                        logger.warning(f"Timeout al enviar código 2FA a: {user.email}")
-                        
-                except Exception as email_error:
-                    logger.error(f"Error al enviar código 2FA: {str(email_error)}")
+                # Enviar email (no bloquea)
+                enviar_codigo_email(user.email, codigo.codigo)
                 
-                # SIEMPRE mostrar el código en los logs
+                # Log del código
                 logger.warning(f"🔑 CÓDIGO 2FA PARA {user.email}: {codigo.codigo}")
                 
                 return Response({
-                    "message": "Código de verificación generado",
+                    "message": "Código de verificación enviado a tu email",
                     "user_id": user.id,
                     "email": user.email,
-                    "requiere_verificacion": True,
-                    # Temporal: devolver código directamente
-                    "codigo": codigo.codigo,
-                    "nota": "Temporal: El código se muestra aquí porque el email no está configurado"
+                    "requiere_verificacion": True
                 }, status=status.HTTP_200_OK)
             
-            # Usuario ya verificado - generar tokens
-            logger.info(f"Generando tokens para usuario verificado: {user.id}")
+            # Usuario ya verificado
             refresh = RefreshToken.for_user(user)
             
             return Response({
@@ -202,7 +149,7 @@ class LoginView(APIView):
         except Exception as e:
             logger.error(f"Error en login: {str(e)}", exc_info=True)
             return Response(
-                {"error": f"Error interno del servidor: {str(e)}"}, 
+                {"error": "Error interno del servidor"}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -215,8 +162,6 @@ class VerificarCodigoView(APIView):
             user_id = request.data.get("user_id")
             codigo_ingresado = request.data.get("codigo")
             
-            logger.info(f"Intento de verificación: user_id={user_id}, codigo={codigo_ingresado}")
-            
             if not user_id or not codigo_ingresado:
                 return Response(
                     {"error": "user_id y código son requeridos"}, 
@@ -226,7 +171,6 @@ class VerificarCodigoView(APIView):
             try:
                 user = User.objects.get(id=user_id)
             except User.DoesNotExist:
-                logger.warning(f"Usuario no encontrado: {user_id}")
                 return Response(
                     {"error": "Usuario no encontrado"}, 
                     status=status.HTTP_404_NOT_FOUND
@@ -239,28 +183,25 @@ class VerificarCodigoView(APIView):
             ).first()
             
             if not codigo:
-                logger.warning(f"Código inválido para usuario: {user_id}")
                 return Response(
                     {"error": "Código inválido"}, 
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
             if not codigo.es_valido():
-                logger.warning(f"Código expirado para usuario: {user_id}")
                 return Response(
                     {"error": "Código expirado"}, 
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
-            # Marcar código como usado
+            # Marcar como usado y verificado
             codigo.usado = True
             codigo.save()
             
-            # Marcar usuario como verificado
             user.verificado_2fa = True
             user.save()
             
-            logger.info(f"Usuario verificado exitosamente: {user_id}")
+            logger.info(f"✅ Usuario verificado: {user.id}")
             
             # Generar tokens
             refresh = RefreshToken.for_user(user)
@@ -276,7 +217,7 @@ class VerificarCodigoView(APIView):
         except Exception as e:
             logger.error(f"Error en verificación: {str(e)}", exc_info=True)
             return Response(
-                {"error": f"Error interno del servidor: {str(e)}"}, 
+                {"error": "Error interno del servidor"}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -288,8 +229,6 @@ class ReenviarCodigoView(APIView):
         try:
             user_id = request.data.get("user_id")
             
-            logger.info(f"Reenvío de código solicitado para: {user_id}")
-            
             if not user_id:
                 return Response(
                     {"error": "user_id es requerido"}, 
@@ -299,7 +238,6 @@ class ReenviarCodigoView(APIView):
             try:
                 user = User.objects.get(id=user_id)
             except User.DoesNotExist:
-                logger.warning(f"Usuario no encontrado: {user_id}")
                 return Response(
                     {"error": "Usuario no encontrado"}, 
                     status=status.HTTP_404_NOT_FOUND
@@ -320,39 +258,19 @@ class ReenviarCodigoView(APIView):
             # Crear nuevo código
             codigo = CodigoVerificacion.objects.create(usuario=user, tipo='login')
             
-            # Intentar enviar email (con timeout)
-            try:
-                import signal
-                
-                def timeout_handler(signum, frame):
-                    raise TimeoutError("Email timeout")
-                
-                signal.signal(signal.SIGALRM, timeout_handler)
-                signal.alarm(5)
-                
-                try:
-                    enviar_codigo_email(user.email, codigo.codigo)
-                    signal.alarm(0)
-                except TimeoutError:
-                    signal.alarm(0)
-                    logger.warning(f"Timeout al reenviar código a: {user.email}")
-                    
-            except Exception as email_error:
-                logger.error(f"Error al reenviar código: {str(email_error)}")
+            # Enviar email
+            enviar_codigo_email(user.email, codigo.codigo)
             
-            # SIEMPRE mostrar el código en los logs
+            # Log del código
             logger.warning(f"🔑 CÓDIGO REENVIADO PARA {user.email}: {codigo.codigo}")
             
             return Response({
-                "message": "Código reenviado exitosamente",
-                # Temporal: devolver código directamente
-                "codigo": codigo.codigo,
-                "nota": "Temporal: El código se muestra aquí porque el email no está configurado"
+                "message": "Código reenviado exitosamente"
             }, status=status.HTTP_200_OK)
             
         except Exception as e:
             logger.error(f"Error al reenviar código: {str(e)}", exc_info=True)
             return Response(
-                {"error": f"Error interno del servidor: {str(e)}"}, 
+                {"error": "Error interno del servidor"}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
