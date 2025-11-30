@@ -72,23 +72,40 @@ class RegisterView(APIView):
             codigo = CodigoVerificacion.objects.create(usuario=user, tipo='registro')
             logger.info(f"Código generado: {codigo.codigo}")
             
-            # Intentar enviar email
+            # Intentar enviar email (con timeout corto para no bloquear)
+            email_enviado = False
             try:
-                email_enviado = enviar_codigo_email(email, codigo.codigo)
-                if email_enviado:
-                    logger.info(f"Email enviado exitosamente a: {email}")
-                else:
-                    logger.warning(f"No se pudo enviar email a: {email}, pero continuamos")
+                import signal
+                
+                def timeout_handler(signum, frame):
+                    raise TimeoutError("Email timeout")
+                
+                # Configurar timeout de 5 segundos
+                signal.signal(signal.SIGALRM, timeout_handler)
+                signal.alarm(5)
+                
+                try:
+                    email_enviado = enviar_codigo_email(email, codigo.codigo)
+                    signal.alarm(0)  # Cancelar alarma
+                except TimeoutError:
+                    signal.alarm(0)
+                    logger.warning(f"Timeout al enviar email a: {email}")
+                    email_enviado = False
+                    
             except Exception as email_error:
                 logger.error(f"Error al enviar email: {str(email_error)}")
-                # No fallar el registro si el email falla
+            
+            # SIEMPRE mostrar el código en los logs (temporal para producción)
+            logger.warning(f"🔑 CÓDIGO DE VERIFICACIÓN PARA {email}: {codigo.codigo}")
             
             return Response({
-                "message": "Usuario creado. Se ha enviado un código de verificación a tu email",
+                "message": "Usuario creado exitosamente. Revisa tu email o contacta con soporte para obtener tu código.",
                 "user_id": user.id,
                 "email": email,
                 "requiere_verificacion": True,
-                "codigo_debug": codigo.codigo if logger.level == logging.DEBUG else None
+                # En producción sin email funcionando, devolver el código directamente
+                "codigo": codigo.codigo,
+                "nota": "Temporal: El código se muestra aquí porque el email no está configurado"
             }, status=status.HTTP_201_CREATED)
             
         except Exception as e:
@@ -137,22 +154,38 @@ class LoginView(APIView):
                 logger.info(f"Generando código 2FA para: {user.id}")
                 codigo = CodigoVerificacion.objects.create(usuario=user, tipo='login')
                 
-                # Intentar enviar email
+                # Intentar enviar email (con timeout)
+                email_enviado = False
                 try:
-                    email_enviado = enviar_codigo_email(user.email, codigo.codigo)
-                    if email_enviado:
-                        logger.info(f"Código 2FA enviado a: {user.email}")
-                    else:
-                        logger.warning(f"No se pudo enviar código 2FA a: {user.email}")
+                    import signal
+                    
+                    def timeout_handler(signum, frame):
+                        raise TimeoutError("Email timeout")
+                    
+                    signal.signal(signal.SIGALRM, timeout_handler)
+                    signal.alarm(5)
+                    
+                    try:
+                        email_enviado = enviar_codigo_email(user.email, codigo.codigo)
+                        signal.alarm(0)
+                    except TimeoutError:
+                        signal.alarm(0)
+                        logger.warning(f"Timeout al enviar código 2FA a: {user.email}")
+                        
                 except Exception as email_error:
                     logger.error(f"Error al enviar código 2FA: {str(email_error)}")
                 
+                # SIEMPRE mostrar el código en los logs
+                logger.warning(f"🔑 CÓDIGO 2FA PARA {user.email}: {codigo.codigo}")
+                
                 return Response({
-                    "message": "Se ha enviado un código de verificación a tu email",
+                    "message": "Código de verificación generado",
                     "user_id": user.id,
                     "email": user.email,
                     "requiere_verificacion": True,
-                    "codigo_debug": codigo.codigo if logger.level == logging.DEBUG else None
+                    # Temporal: devolver código directamente
+                    "codigo": codigo.codigo,
+                    "nota": "Temporal: El código se muestra aquí porque el email no está configurado"
                 }, status=status.HTTP_200_OK)
             
             # Usuario ya verificado - generar tokens
@@ -287,19 +320,34 @@ class ReenviarCodigoView(APIView):
             # Crear nuevo código
             codigo = CodigoVerificacion.objects.create(usuario=user, tipo='login')
             
-            # Intentar enviar email
+            # Intentar enviar email (con timeout)
             try:
-                email_enviado = enviar_codigo_email(user.email, codigo.codigo)
-                if email_enviado:
-                    logger.info(f"Código reenviado a: {user.email}")
-                else:
-                    logger.warning(f"No se pudo reenviar código a: {user.email}")
+                import signal
+                
+                def timeout_handler(signum, frame):
+                    raise TimeoutError("Email timeout")
+                
+                signal.signal(signal.SIGALRM, timeout_handler)
+                signal.alarm(5)
+                
+                try:
+                    enviar_codigo_email(user.email, codigo.codigo)
+                    signal.alarm(0)
+                except TimeoutError:
+                    signal.alarm(0)
+                    logger.warning(f"Timeout al reenviar código a: {user.email}")
+                    
             except Exception as email_error:
                 logger.error(f"Error al reenviar código: {str(email_error)}")
             
+            # SIEMPRE mostrar el código en los logs
+            logger.warning(f"🔑 CÓDIGO REENVIADO PARA {user.email}: {codigo.codigo}")
+            
             return Response({
                 "message": "Código reenviado exitosamente",
-                "codigo_debug": codigo.codigo if logger.level == logging.DEBUG else None
+                # Temporal: devolver código directamente
+                "codigo": codigo.codigo,
+                "nota": "Temporal: El código se muestra aquí porque el email no está configurado"
             }, status=status.HTTP_200_OK)
             
         except Exception as e:

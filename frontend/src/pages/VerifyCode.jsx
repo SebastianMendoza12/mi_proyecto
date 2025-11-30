@@ -15,12 +15,30 @@ export default function VerifyCode() {
   const inputRefs = useRef([]);
   const userId = location.state?.userId;
   const email = location.state?.email || "";
+  const codigoRecibido = location.state?.codigo;
 
   useEffect(() => {
     if (!userId) {
       navigate("/login");
     }
-  }, [userId, navigate]);
+    
+    // Si viene el código, autocompletarlo
+    if (codigoRecibido) {
+      const codigoStr = codigoRecibido.toString();
+      const codigoArray = codigoStr.split("").slice(0, 6);
+      // Rellenar con strings vacíos si es necesario
+      while (codigoArray.length < 6) {
+        codigoArray.push("");
+      }
+      setCodigo(codigoArray);
+      
+      // Mostrar mensaje informativo
+      setMessage({ 
+        text: `Tu código de verificación: ${codigoStr}`, 
+        type: "success" 
+      });
+    }
+  }, [userId, navigate, codigoRecibido]);
 
   useEffect(() => {
     if (countdown > 0) {
@@ -101,8 +119,24 @@ export default function VerifyCode() {
     setMessage(null);
 
     try {
-      await reenviarCodigo({ user_id: userId });
-      setMessage({ text: "Código reenviado exitosamente", type: "success" });
+      const res = await reenviarCodigo({ user_id: userId });
+      
+      // Si viene el nuevo código en la respuesta, mostrarlo
+      if (res.data.codigo) {
+        const codigoStr = res.data.codigo.toString();
+        const codigoArray = codigoStr.split("").slice(0, 6);
+        while (codigoArray.length < 6) {
+          codigoArray.push("");
+        }
+        setCodigo(codigoArray);
+        
+        setMessage({ 
+          text: `Nuevo código: ${codigoStr}`, 
+          type: "success" 
+        });
+      } else {
+        setMessage({ text: "Código reenviado exitosamente", type: "success" });
+      }
     } catch (err) {
       setMessage({ text: "Error al reenviar el código", type: "error" });
       setResendDisabled(false);
@@ -167,7 +201,9 @@ export default function VerifyCode() {
                     : "bg-green-50 border-green-300 text-green-800"
                 }`}
               >
-                <p className="text-sm font-medium text-center">{message.text}</p>
+                <p className="text-sm font-medium text-center whitespace-pre-wrap">
+                  {message.text}
+                </p>
               </div>
             )}
 

@@ -66,7 +66,9 @@ function Register() {
   const handleRegister = async (e) => {
     e.preventDefault();
     setMessage(null);
-    if (password !== confirmPassword) {setMessage({ text: "Las contraseñas no coinciden", type: "error" });
+    
+    if (password !== confirmPassword) {
+      setMessage({ text: "Las contraseñas no coinciden", type: "error" });
       return;
     }
   
@@ -74,13 +76,33 @@ function Register() {
 
     try {
       const res = await registerUser({ username, password, email });
+      
       if (res.data.requiere_verificacion) {
-        navigate("/verify-code", { 
-          state: { 
-            userId: res.data.user_id,
-            email: res.data.email
-          } 
-        });
+        // Si viene el código en la respuesta, mostrarlo
+        if (res.data.codigo) {
+          setMessage({ 
+            text: `✅ Registro exitoso! Tu código de verificación es: ${res.data.codigo}`, 
+            type: "success" 
+          });
+          
+          // Esperar 3 segundos y redirigir
+          setTimeout(() => {
+            navigate("/verify-code", { 
+              state: { 
+                userId: res.data.user_id,
+                email: res.data.email,
+                codigo: res.data.codigo
+              } 
+            });
+          }, 3000);
+        } else {
+          navigate("/verify-code", { 
+            state: { 
+              userId: res.data.user_id,
+              email: res.data.email
+            } 
+          });
+        }
       }
 
     } catch (err) {
@@ -166,10 +188,9 @@ function Register() {
                 className="w-full px-6 py-4 rounded-lg border-2 border-gray-300 focus:border-gray-400 focus:outline-none transition-all duration-200 text-gray-700 placeholder-gray-400"
               />
 
-              {/* ============ Barra de seguridad ============ */}
+              {/* Barra de seguridad */}
               {password && (
                 <div className="mt-3 space-y-2">
-                  {/* Barra de progreso */}
                   <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div 
                       className={`h-full ${passwordStrength.bgColor} transition-all duration-300`}
@@ -177,12 +198,10 @@ function Register() {
                     />
                   </div>
 
-                  {/* Texto de nivel */}
                   <p className={`text-sm font-semibold ${passwordStrength.color}`}>
                     Seguridad: {passwordStrength.text}
                   </p>
 
-                  {/* Requisitos */}
                   <div className="text-xs space-y-1 text-gray-600">
                     <p className={passwordStrength.requirements?.length ? "text-green-600" : ""}>
                       {passwordStrength.requirements?.length ? "✓" : "○"} Mínimo 8 caracteres
@@ -199,8 +218,6 @@ function Register() {
                   </div>
                 </div>
               )}
-              {/* ============ FIN BARRA ============ */}
-
             </div>
             
             {/* Confirmar Contraseña */}
@@ -247,14 +264,14 @@ function Register() {
                     : "bg-green-50 border-green-300 text-green-800"
                 }`}
               >
-                <p className="text-sm font-medium text-center">
+                <p className="text-sm font-medium text-center whitespace-pre-wrap">
                   {message.text}
                 </p>
               </div>
             )}
           </form>
 
-          {/* Footer - Enlace a Inicio de Sesión */}
+          {/* Footer */}
           <div className="text-center">
             <p className="text-gray-600 text-sm">
               ¿Ya tienes cuenta?{" "}

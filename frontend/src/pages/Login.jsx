@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-//import { loginUser  } from "../services/api";
 import axios from "axios";
 import logo from "../assets/LogotipoProyecto.png";
 
@@ -23,13 +22,33 @@ function Login() {
         username, 
         password 
       });
+      
       if (res.data.requiere_verificacion) {
-        navigate("/verify-code", { 
-          state: { 
-            userId: res.data.user_id,
-            email: res.data.email || ""
-          } 
-        });
+        // Si viene el código en la respuesta, mostrarlo
+        if (res.data.codigo) {
+          setMessage({ 
+            text: `✅ Código de verificación: ${res.data.codigo}`, 
+            type: "success" 
+          });
+          
+          // Esperar 2 segundos y redirigir
+          setTimeout(() => {
+            navigate("/verify-code", { 
+              state: { 
+                userId: res.data.user_id,
+                email: res.data.email || "",
+                codigo: res.data.codigo
+              } 
+            });
+          }, 2000);
+        } else {
+          navigate("/verify-code", { 
+            state: { 
+              userId: res.data.user_id,
+              email: res.data.email || ""
+            } 
+          });
+        }
       } else {
         localStorage.setItem("access_token", res.data.access);
         localStorage.setItem("refresh_token", res.data.refresh);
@@ -123,7 +142,9 @@ function Login() {
                     : "bg-green-50 border-green-300 text-green-800"
                 }`}
               >
-                <p className="text-sm font-medium text-center"> {message.text} </p>
+                <p className="text-sm font-medium text-center whitespace-pre-wrap">
+                  {message.text}
+                </p>
               </div>
             )}
           </form>
@@ -154,7 +175,6 @@ function Login() {
       </div>
     </div>
   );
-
 }
 
 export default Login;
