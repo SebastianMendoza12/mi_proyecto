@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Buscar from "./pages/Buscar";
+import VerifyCode from "./pages/VerifyCode";
 // import MiCuenta from "./pages/MiCuenta";
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/buscar" element={<Buscar />} />
+          <Route path="/verify-code" element={<VerifyCode />} />
           {/* <Route path="/mi-cuenta" element={<MiCuenta />} /> */}
         </Routes>
     </Router>

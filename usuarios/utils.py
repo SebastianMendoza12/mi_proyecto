@@ -39,8 +39,8 @@ Equipo FastFood.exe
         send_mail(
             asunto,
             mensaje,
-            settings.EMAIL_HOST_USER,  # From
-            [email],                    # To
+            settings.DEFAULT_FROM_EMAIL,  # From (email verificado en SendGrid)
+            [email],                       # To
             fail_silently=False,
         )
         
