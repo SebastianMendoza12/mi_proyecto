@@ -25,12 +25,23 @@ Si no solicitaste este código, ignora este mensaje.
 Equipo FastFood.exe 🍔
         """
         
-        logger.info(f"📧 Enviando email a: {email}")
+        logger.info(f"📧 Thread iniciado - Enviando email a: {email}")
+        
+        # Verificar configuración
+        logger.info(f"🔧 EMAIL_HOST: {settings.EMAIL_HOST}")
+        logger.info(f"🔧 EMAIL_PORT: {settings.EMAIL_PORT}")
+        logger.info(f"🔧 EMAIL_USE_TLS: {settings.EMAIL_USE_TLS}")
+        logger.info(f"🔧 EMAIL_HOST_USER: {settings.EMAIL_HOST_USER}")
+        logger.info(f"🔧 EMAIL_HOST_PASSWORD configurado: {'Sí' if settings.EMAIL_HOST_PASSWORD else 'NO'}")
+        
+        # Usar DEFAULT_FROM_EMAIL si está configurado, sino EMAIL_HOST_USER
+        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', settings.EMAIL_HOST_USER)
+        logger.info(f"🔧 FROM_EMAIL: {from_email}")
         
         send_mail(
             subject=asunto,
             message=mensaje,
-            from_email=settings.EMAIL_HOST_USER,
+            from_email=from_email,
             recipient_list=[email],
             fail_silently=False,
         )
@@ -39,6 +50,9 @@ Equipo FastFood.exe 🍔
         
     except Exception as e:
         logger.error(f"❌ Error al enviar email a {email}: {str(e)}")
+        logger.error(f"❌ Tipo de error: {type(e).__name__}")
+        import traceback
+        logger.error(f"❌ Traceback completo: {traceback.format_exc()}")
 
 
 def enviar_codigo_email(email, codigo):
