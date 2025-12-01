@@ -76,8 +76,12 @@ def enviar_codigo_email(email, codigo):
             target=enviar_codigo_email_async,
             args=(email, codigo)
         )
-        thread.daemon = True
+        # Cambiar a daemon=False para que el thread termine antes de cerrar
+        thread.daemon = False
         thread.start()
+        
+        # OPCIONAL: Esperar máximo 2 segundos para que el thread termine
+        thread.join(timeout=2)
         
         logger.info(f"🚀 Email en cola para: {email}")
         return True
