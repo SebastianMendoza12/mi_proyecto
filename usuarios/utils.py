@@ -34,8 +34,13 @@ Equipo FastFood.exe 🍔
         logger.info(f"🔧 EMAIL_HOST_USER: {settings.EMAIL_HOST_USER}")
         logger.info(f"🔧 EMAIL_HOST_PASSWORD configurado: {'Sí' if settings.EMAIL_HOST_PASSWORD else 'NO'}")
         
-        # Usar DEFAULT_FROM_EMAIL si está configurado, sino EMAIL_HOST_USER
-        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', settings.EMAIL_HOST_USER)
+        # Usar DEFAULT_FROM_EMAIL si está configurado, sino un email por defecto
+        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', None)
+        
+        # Si DEFAULT_FROM_EMAIL no está configurado, usar un email genérico
+        if not from_email or from_email == settings.EMAIL_HOST_USER:
+            from_email = 'fastfoodexe@gmail.com'  # Cambiar por tu dominio verificado
+            
         logger.info(f"🔧 FROM_EMAIL: {from_email}")
         
         send_mail(
