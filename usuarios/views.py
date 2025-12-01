@@ -72,7 +72,7 @@ class RegisterView(APIView):
             codigo = CodigoVerificacion.objects.create(usuario=user, tipo='registro')
             logger.info(f"Código generado: {codigo.codigo}")
             
-            # Enviar email en segundo plano (no bloquear)
+            # Enviar email en segundo plano
             try:
                 from threading import Thread
                 email_thread = Thread(
@@ -85,16 +85,15 @@ class RegisterView(APIView):
             except Exception as email_error:
                 logger.error(f"Error al iniciar thread de email: {str(email_error)}")
             
-            # SIEMPRE mostrar el código en los logs
+            # Mostrar código SOLO en logs (no en respuesta)
             logger.warning(f"🔑 CÓDIGO DE VERIFICACIÓN PARA {email}: {codigo.codigo}")
             
+            # ✅ NO enviar el código en la respuesta
             return Response({
-                "message": "Usuario creado exitosamente",
+                "message": "Usuario creado exitosamente. Revisa tu email",
                 "user_id": user.id,
                 "email": email,
-                "requiere_verificacion": True,
-                "codigo": codigo.codigo,
-                "nota": "Revisa tu email. Si no llega, usa este código"
+                "requiere_verificacion": True
             }, status=status.HTTP_201_CREATED)
             
         except Exception as e:
@@ -156,16 +155,15 @@ class LoginView(APIView):
                 except Exception as email_error:
                     logger.error(f"Error al iniciar thread de email: {str(email_error)}")
                 
-                # SIEMPRE mostrar el código en los logs
+                # Mostrar código SOLO en logs (no en respuesta)
                 logger.warning(f"🔑 CÓDIGO 2FA PARA {user.email}: {codigo.codigo}")
                 
+                # ✅ NO enviar el código en la respuesta
                 return Response({
-                    "message": "Código de verificación generado",
+                    "message": "Código de verificación enviado a tu email",
                     "user_id": user.id,
                     "email": user.email,
-                    "requiere_verificacion": True,
-                    "codigo": codigo.codigo,
-                    "nota": "Revisa tu email. Si no llega, usa este código"
+                    "requiere_verificacion": True
                 }, status=status.HTTP_200_OK)
             
             # Usuario ya verificado - generar tokens
@@ -313,13 +311,12 @@ class ReenviarCodigoView(APIView):
             except Exception as email_error:
                 logger.error(f"Error al iniciar thread de email: {str(email_error)}")
             
-            # SIEMPRE mostrar el código en los logs
+            # Mostrar código SOLO en logs (no en respuesta)
             logger.warning(f"🔑 CÓDIGO REENVIADO PARA {user.email}: {codigo.codigo}")
             
+            # ✅ NO enviar el código en la respuesta
             return Response({
-                "message": "Código reenviado exitosamente",
-                "codigo": codigo.codigo,
-                "nota": "Revisa tu email. Si no llega, usa este código"
+                "message": "Código reenviado exitosamente. Revisa tu email"
             }, status=status.HTTP_200_OK)
             
         except Exception as e:

@@ -20,7 +20,14 @@ def enviar_codigo_email(email, codigo):
             return False
         
         # ✅ CORRECCIÓN: Usar el email verificado en SendGrid
-        from_email = settings.DEFAULT_FROM_EMAIL or "fastfoodexe@gmail.com"
+        # NO usar EMAIL_HOST_USER porque es "apikey", usar DEFAULT_FROM_EMAIL
+        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'fastfoodexe@gmail.com')
+        
+        # Validar que from_email sea un email real, no "apikey"
+        if from_email == 'apikey' or '@' not in from_email:
+            from_email = 'fastfoodexe@gmail.com'
+        
+        logger.info(f"📤 Usando remitente: {from_email}")
         
         # Preparar email HTML
         asunto = 'Código de Verificación - FastFood.exe'
