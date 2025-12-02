@@ -155,6 +155,19 @@ export default function Home() {
             {categories.map((cat) => (
               <button
                 key={cat.id}
+                onClick={() => {
+                  const rutas = {
+                    "bebidas": "/bebidas",
+                    "hamburguesas": "/hamburguesas",
+                    "combos": "/combos",
+                    "postres": "/postres",
+                    "acompañantes": "/acompañantes",
+                    "pizzza": "/pizzas",
+                    "perros": "/perros",
+                };
+                const ruta = rutas[cat.name.toLowerCase()];
+                if (ruta) navigate(ruta);
+                }}
                 className="flex flex-col items-center gap-2 px-6 py-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow min-w-[120px]"
               >
                 <span className="text-3xl">{cat.icon}</span>
