@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/LogotipoProyecto.png";
-import { getProductos } from "../services/api";
 
 export default function Bebidas() {
   const [searchQuery, setSearchQuery] = useState("");
