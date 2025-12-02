@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/LogotipoProyecto.png";
-import { getProductos } from "../services/api";
 
 export default function Bebidas() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -10,7 +9,6 @@ export default function Bebidas() {
   const [username, setUsername] = useState("");
   const navigate = useNavigate();
 
-  // Verificar si está logueado
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     const user = localStorage.getItem("username");
@@ -20,44 +18,29 @@ export default function Bebidas() {
     }
   }, []);
 
-  // Datos de bebidas (estáticos por ahora)
   const bebidas = [
-    { id: 1, name: "Malteada de fresa", price: 13900, image: "" },
-    { id: 2, name: "Jugo de naranja", price: 10900, image: "" },
-    { id: 3, name: "Jugo de maracuyá", price: 11900, image: "" },
-    { id: 4, name: "Gaseosa 1 ltr", price: 8900, image: "" },
-    { id: 5, name: "Malteada de chocolate", price: 13900, image: "" },
-    { id: 6, name: "Agua 1 ltr", price: 2900, image: "" },
-    { id: 7, name: "Jugo del valle", price: 4900, image: "" },
-    { id: 8, name: "Malteada de mora", price: 13900, image: "" },
+    { id: 1, name: "Gaseosa personal", price: 3900, image: "" },
+    { id: 2, name: "Gaseosa 1.5 litros", price: 6900, image: "" },
+    { id: 3, name: "Té helado", price: 4500, image: "" },
+    { id: 4, name: "Agua en botella", price: 3000, image: "" },
+    { id: 5, name: "Malteada de vainilla", price: 8900, image: "" },
+    { id: 6, name: "Malteada de chocolate", price: 9500, image: "" },
+    { id: 7, name: "Jugos naturales", price: 6500, image: "" },
+    { id: 8, name: "Limonada cerezada", price: 5500, image: "" },
   ];
 
-  // Filtrar y ordenar
   const bebidasFiltradas = bebidas
     .filter((b) => b.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    .sort((a, b) => {
-      if (ordenar === "precio") {
-        return a.price - b.price;
-      }
-      return a.name.localeCompare(b.name);
-    });
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-  };
+    .sort((a, b) => ordenar === "precio" ? a.price - b.price : a.name.localeCompare(b.name));
 
   const handleLogout = () => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-    localStorage.removeItem("username");
-    setIsLoggedIn(false);
-    setUsername("");
+    localStorage.clear();
     navigate("/");
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* ========== HEADER ========== */}
+    <div className="min-h-screen bg-white flex flex-col">
+      {/* HEADER */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-6">
@@ -66,121 +49,77 @@ export default function Bebidas() {
             </button>
 
             <div className="flex items-center gap-4">
-              {isLoggedIn ? (
+              {isLoggedIn && (
                 <>
                   <span className="text-gray-700 font-semibold">
                     BIENVENIDO {username.toUpperCase()}
                   </span>
                   <button
-                    onClick={() => navigate("/")}
-                    className="px-6 py-3 rounded-full font-semibold text-white transition-all"
-                    style={{ backgroundColor: '#808080' }}
+                    onClick={() => navigate("/micuenta")}
+                    className="px-6 py-3 rounded-full font-semibold text-white"
+                    style={{ backgroundColor: "#808080" }}
                   >
                     MI CUENTA
                   </button>
                   <button
                     onClick={handleLogout}
-                    className="px-6 py-3 rounded-full font-semibold text-white transition-all hover:opacity-90"
-                    style={{ backgroundColor: '#DC143C' }}
+                    className="px-6 py-3 rounded-full font-semibold text-white hover:opacity-90"
+                    style={{ backgroundColor: "#DC143C" }}
                   >
                     CERRAR SESIÓN
                   </button>
                 </>
-              ) : null}
+              )}
             </div>
           </div>
 
-          {/* Título - Sección de Bebidas */}
-          <div className="mb-6">
-            <h1 className="text-4xl font-bold">Sección de bebidas</h1>
-          </div>
+          <h1 className="text-4xl font-bold mb-6">Sección de bebidas</h1>
 
-          {/* Buscador y Ordenamiento */}
-          <form onSubmit={handleSearch} className="relative">
-            <div className="flex gap-2">
-              <div className="flex-1 relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                  🔍
-                </span>
-                <input
-                  type="text"
-                  placeholder="Ingresa el nombre del producto"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 rounded-lg border-2 border-gray-300 focus:border-gray-400 focus:outline-none"
-                />
-              </div>
-              <button
-                type="submit"
-                className="px-8 py-3 rounded-lg font-bold text-white transition-all"
-                style={{ backgroundColor: '#FFD700' }}
-              >
-                BUSCAR
-              </button>
-              <select
-                value={ordenar}
-                onChange={(e) => setOrdenar(e.target.value)}
-                className="px-4 py-3 rounded-lg border-2 border-gray-300 bg-white font-semibold cursor-pointer"
-              >
-                <option value="nombre">Nombre</option>
-                <option value="precio">Ordenar por precio</option>
-              </select>
+          <div className="flex flex-col md:flex-row gap-2">
+            <div className="flex-1 relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+              <input
+                type="text"
+                placeholder="Ingresa el nombre del producto"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 rounded-lg border-2 border-gray-300"
+              />
             </div>
-          </form>
+
+            <select
+              value={ordenar}
+              onChange={(e) => setOrdenar(e.target.value)}
+              className="px-4 py-3 rounded-lg border-2 bg-white font-semibold"
+            >
+              <option value="nombre">Nombre</option>
+              <option value="precio">Ordenar por precio</option>
+            </select>
+          </div>
         </div>
       </header>
 
-      {/* ========== PRODUCTOS BEBIDAS ========== */}
-      <section className="py-12">
+      {/* CONTENIDO */}
+      <section className="py-12 flex-grow">
         <div className="max-w-7xl mx-auto px-4">
           <p className="text-gray-600 mb-6">
             Se encontraron <strong>{bebidasFiltradas.length}</strong> bebida(s)
           </p>
 
           {bebidasFiltradas.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">
-                No se encontraron bebidas 😞
-              </p>
-              <button
-                onClick={() => navigate("/")}
-                className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg font-semibold"
-              >
-                Volver al inicio
-              </button>
-            </div>
+            <p className="text-center text-gray-500 py-12 text-lg">No se encontraron bebidas 😞</p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {bebidasFiltradas.map((bebida) => (
-                <div
-                  key={bebida.id}
-                  className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
-                >
-                  {/* Imagen */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 place-items-center">
+              {bebidasFiltradas.map((b) => (
+                <div key={b.id} className="bg-white rounded-2xl shadow-lg w-full max-w-xs">
                   <div className="w-full h-48 bg-gray-200 flex items-center justify-center text-4xl">
-                    {bebida.image ? (
-                      <img
-                        src={bebida.image}
-                        alt={bebida.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      "🥤"
-                    )}
+                    🍹
                   </div>
-
-                  {/* Info */}
                   <div className="p-5">
-                    <h3 className="font-semibold text-gray-800 mb-3 text-sm h-10">
-                      {bebida.name}
-                    </h3>
-                    <p className="text-2xl font-bold text-gray-900 mb-4">
-                      ${bebida.price.toLocaleString('es-CO')}
-                    </p>
-                    <button
-                      className="w-full py-3 rounded-lg font-bold text-white transition-all hover:opacity-90"
-                      style={{ backgroundColor: '#28A745' }}
-                    >
+                    <h3 className="font-semibold text-gray-800 mb-3">{b.name}</h3>
+                    <p className="text-2xl font-bold mb-4">${b.price.toLocaleString("es-CO")}</p>
+                    <button className="w-full py-3 rounded-lg font-bold text-white"
+                      style={{ backgroundColor: "#28A745" }}>
                       Añadir al carrito
                     </button>
                   </div>
@@ -203,7 +142,7 @@ export default function Bebidas() {
             </a>
             <a href="#" className="text-3xl hover:scale-110 transition-transform">
               <svg className="w-8 h-8 fill-current" viewBox="0 0 24 24">
-                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417a9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
               </svg>
             </a>
             <a href="#" className="text-3xl hover:scale-110 transition-transform">
@@ -222,3 +161,4 @@ export default function Bebidas() {
     </div>
   );
 }
+
