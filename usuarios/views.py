@@ -4,6 +4,7 @@ from rest_framework.permissions import AllowAny
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.utils import timezone
 import re
 import logging
 from .models import CodigoVerificacion
@@ -67,17 +68,29 @@ class RegisterView(APIView):
             logger.info(f"Usuario creado exitosamente: {user.id}")
             
             # Crear código de verificación
+            logger.info(f"Generando código de verificación para: {user.id}")
             codigo = CodigoVerificacion.objects.create(usuario=user, tipo='registro')
             logger.info(f"Código generado: {codigo.codigo}")
             
-            # Enviar email en segundo plano (no bloquea la respuesta)
-            enviar_codigo_email(email, codigo.codigo)
+            # Enviar email en segundo plano
+            try:
+                from threading import Thread
+                email_thread = Thread(
+                    target=enviar_codigo_email, 
+                    args=(email, codigo.codigo)
+                )
+                email_thread.daemon = True
+                email_thread.start()
+                logger.info(f"Email enviándose en segundo plano a: {email}")
+            except Exception as email_error:
+                logger.error(f"Error al iniciar thread de email: {str(email_error)}")
             
-            # Log del código (se verá en los logs de Render)
-            logger.warning(f"🔑 CÓDIGO PARA {email}: {codigo.codigo}")
+            # Mostrar código SOLO en logs (no en respuesta)
+            logger.warning(f"🔑 CÓDIGO DE VERIFICACIÓN PARA {email}: {codigo.codigo}")
             
+            # ✅ NO enviar el código en la respuesta
             return Response({
-                "message": "Usuario creado exitosamente. Revisa tu email.",
+                "message": "Usuario creado exitosamente. Revisa tu email",
                 "user_id": user.id,
                 "email": email,
                 "requiere_verificacion": True
@@ -86,7 +99,7 @@ class RegisterView(APIView):
         except Exception as e:
             logger.error(f"Error en registro: {str(e)}", exc_info=True)
             return Response(
-                {"error": "Error interno del servidor"}, 
+                {"error": f"Error interno del servidor: {str(e)}"}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -99,6 +112,8 @@ class LoginView(APIView):
             username = request.data.get("username")
             password = request.data.get("password")
             
+            logger.info(f"Intento de login: username={username}")
+            
             if not username or not password:
                 return Response(
                     {"error": "Usuario y contraseña son requeridos"}, 
@@ -108,10 +123,13 @@ class LoginView(APIView):
             user = authenticate(username=username, password=password)
             
             if not user:
+                logger.warning(f"Credenciales incorrectas para: {username}")
                 return Response(
                     {"error": "Credenciales incorrectas"}, 
                     status=status.HTTP_401_UNAUTHORIZED
                 )
+            
+            logger.info(f"Usuario autenticado: {user.id}, verificado_2fa: {user.verificado_2fa}")
             
             if not user.verificado_2fa:
                 if not user.email:
@@ -121,14 +139,26 @@ class LoginView(APIView):
                     )
                 
                 # Crear código de verificación
+                logger.info(f"Generando código 2FA para: {user.id}")
                 codigo = CodigoVerificacion.objects.create(usuario=user, tipo='login')
                 
-                # Enviar email (no bloquea)
-                enviar_codigo_email(user.email, codigo.codigo)
+                # Enviar email en segundo plano
+                try:
+                    from threading import Thread
+                    email_thread = Thread(
+                        target=enviar_codigo_email,
+                        args=(user.email, codigo.codigo)
+                    )
+                    email_thread.daemon = True
+                    email_thread.start()
+                    logger.info(f"Código 2FA enviándose en segundo plano a: {user.email}")
+                except Exception as email_error:
+                    logger.error(f"Error al iniciar thread de email: {str(email_error)}")
                 
-                # Log del código
+                # Mostrar código SOLO en logs (no en respuesta)
                 logger.warning(f"🔑 CÓDIGO 2FA PARA {user.email}: {codigo.codigo}")
                 
+                # ✅ NO enviar el código en la respuesta
                 return Response({
                     "message": "Código de verificación enviado a tu email",
                     "user_id": user.id,
@@ -136,7 +166,8 @@ class LoginView(APIView):
                     "requiere_verificacion": True
                 }, status=status.HTTP_200_OK)
             
-            # Usuario ya verificado
+            # Usuario ya verificado - generar tokens
+            logger.info(f"Generando tokens para usuario verificado: {user.id}")
             refresh = RefreshToken.for_user(user)
             
             return Response({
@@ -149,7 +180,7 @@ class LoginView(APIView):
         except Exception as e:
             logger.error(f"Error en login: {str(e)}", exc_info=True)
             return Response(
-                {"error": "Error interno del servidor"}, 
+                {"error": f"Error interno del servidor: {str(e)}"}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -162,6 +193,8 @@ class VerificarCodigoView(APIView):
             user_id = request.data.get("user_id")
             codigo_ingresado = request.data.get("codigo")
             
+            logger.info(f"Intento de verificación: user_id={user_id}, codigo={codigo_ingresado}")
+            
             if not user_id or not codigo_ingresado:
                 return Response(
                     {"error": "user_id y código son requeridos"}, 
@@ -171,6 +204,7 @@ class VerificarCodigoView(APIView):
             try:
                 user = User.objects.get(id=user_id)
             except User.DoesNotExist:
+                logger.warning(f"Usuario no encontrado: {user_id}")
                 return Response(
                     {"error": "Usuario no encontrado"}, 
                     status=status.HTTP_404_NOT_FOUND
@@ -183,25 +217,28 @@ class VerificarCodigoView(APIView):
             ).first()
             
             if not codigo:
+                logger.warning(f"Código inválido para usuario: {user_id}")
                 return Response(
                     {"error": "Código inválido"}, 
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
             if not codigo.es_valido():
+                logger.warning(f"Código expirado para usuario: {user_id}")
                 return Response(
                     {"error": "Código expirado"}, 
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
-            # Marcar como usado y verificado
+            # Marcar código como usado
             codigo.usado = True
             codigo.save()
             
+            # Marcar usuario como verificado
             user.verificado_2fa = True
             user.save()
             
-            logger.info(f"✅ Usuario verificado: {user.id}")
+            logger.info(f"Usuario verificado exitosamente: {user_id}")
             
             # Generar tokens
             refresh = RefreshToken.for_user(user)
@@ -217,7 +254,7 @@ class VerificarCodigoView(APIView):
         except Exception as e:
             logger.error(f"Error en verificación: {str(e)}", exc_info=True)
             return Response(
-                {"error": "Error interno del servidor"}, 
+                {"error": f"Error interno del servidor: {str(e)}"}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -229,6 +266,8 @@ class ReenviarCodigoView(APIView):
         try:
             user_id = request.data.get("user_id")
             
+            logger.info(f"Reenvío de código solicitado para: {user_id}")
+            
             if not user_id:
                 return Response(
                     {"error": "user_id es requerido"}, 
@@ -238,6 +277,7 @@ class ReenviarCodigoView(APIView):
             try:
                 user = User.objects.get(id=user_id)
             except User.DoesNotExist:
+                logger.warning(f"Usuario no encontrado: {user_id}")
                 return Response(
                     {"error": "Usuario no encontrado"}, 
                     status=status.HTTP_404_NOT_FOUND
@@ -258,19 +298,30 @@ class ReenviarCodigoView(APIView):
             # Crear nuevo código
             codigo = CodigoVerificacion.objects.create(usuario=user, tipo='login')
             
-            # Enviar email
-            enviar_codigo_email(user.email, codigo.codigo)
+            # Enviar email en segundo plano
+            try:
+                from threading import Thread
+                email_thread = Thread(
+                    target=enviar_codigo_email,
+                    args=(user.email, codigo.codigo)
+                )
+                email_thread.daemon = True
+                email_thread.start()
+                logger.info(f"Código reenviándose en segundo plano a: {user.email}")
+            except Exception as email_error:
+                logger.error(f"Error al iniciar thread de email: {str(email_error)}")
             
-            # Log del código
+            # Mostrar código SOLO en logs (no en respuesta)
             logger.warning(f"🔑 CÓDIGO REENVIADO PARA {user.email}: {codigo.codigo}")
             
+            # ✅ NO enviar el código en la respuesta
             return Response({
-                "message": "Código reenviado exitosamente"
+                "message": "Código reenviado exitosamente. Revisa tu email"
             }, status=status.HTTP_200_OK)
             
         except Exception as e:
             logger.error(f"Error al reenviar código: {str(e)}", exc_info=True)
             return Response(
-                {"error": "Error interno del servidor"}, 
+                {"error": f"Error interno del servidor: {str(e)}"}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
