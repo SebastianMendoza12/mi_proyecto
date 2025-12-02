@@ -82,24 +82,7 @@ export default function Perros() {
                     CERRAR SESIÓN
                   </button>
                 </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => navigate("/login")}
-                    className="px-8 py-3 rounded-full font-semibold text-white transition-all"
-                    style={{ backgroundColor: '#808080' }}
-                  >
-                    INICIAR SESIÓN
-                  </button>
-                  <button
-                    onClick={() => navigate("/register")}
-                    className="px-8 py-3 rounded-full font-semibold text-white transition-all"
-                    style={{ backgroundColor: '#808080' }}
-                  >
-                    REGISTRARSE
-                  </button>
-                </>
-              )}
+              ) : null}
             </div>
           </div>
 

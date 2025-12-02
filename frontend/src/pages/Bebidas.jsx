@@ -61,12 +61,10 @@ export default function Bebidas() {
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-6">
-            {/* Logo */}
             <button onClick={() => navigate("/")} className="cursor-pointer">
               <img src={logo} alt="FastFood.exe" className="h-16 w-auto" />
             </button>
 
-            {/* Botones según estado de login */}
             <div className="flex items-center gap-4">
               {isLoggedIn ? (
                 <>
@@ -88,24 +86,7 @@ export default function Bebidas() {
                     CERRAR SESIÓN
                   </button>
                 </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => navigate("/login")}
-                    className="px-8 py-3 rounded-full font-semibold text-white transition-all"
-                    style={{ backgroundColor: '#808080' }}
-                  >
-                    INICIAR SESIÓN
-                  </button>
-                  <button
-                    onClick={() => navigate("/register")}
-                    className="px-8 py-3 rounded-full font-semibold text-white transition-all"
-                    style={{ backgroundColor: '#808080' }}
-                  >
-                    REGISTRARSE
-                  </button>
-                </>
-              )}
+              ) : null}
             </div>
           </div>
 
