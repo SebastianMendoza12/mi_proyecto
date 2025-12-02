@@ -12,7 +12,14 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // Lista de rutas que NO necesitan token
-    const publicRoutes = ['/api/auth/register/', '/api/auth/login/', '/api/auth/verificar-codigo/', '/api/auth/reenviar-codigo/'];
+    const publicRoutes = [
+      '/api/auth/register/', 
+      '/api/auth/login/', 
+      '/api/auth/verificar-codigo/', 
+      '/api/auth/reenviar-codigo/',
+      '/api/productos/',
+      '/api/categorias/'
+    ];
     const isPublicRoute = publicRoutes.some(route => config.url?.includes(route));
     
     // Solo agrega el token si NO es una ruta pública
@@ -51,7 +58,14 @@ api.interceptors.response.use(
     if (!originalRequest) return Promise.reject(error);
     
     // Lista de rutas públicas que NO deben intentar refrescar token
-    const publicRoutes = ['/api/auth/register/', '/api/auth/login/', '/api/auth/verificar-codigo/', '/api/auth/reenviar-codigo/'];
+    const publicRoutes = [
+      '/api/auth/register/', 
+      '/api/auth/login/', 
+      '/api/auth/verificar-codigo/', 
+      '/api/auth/reenviar-codigo/',
+      '/api/productos/',
+      '/api/categorias/'
+    ];
     const isPublicRoute = publicRoutes.some(route => originalRequest.url?.includes(route));
 
     // Si es ruta pública, no intentar refrescar token
@@ -125,16 +139,29 @@ export const verificarCodigo = (data) => api.post("/api/auth/verificar-codigo/",
 
 export const reenviarCodigo = (data) => api.post("/api/auth/reenviar-codigo/", data);
 
-// ========== PRODUCTOS ==========
+// ========== CATEGORÍAS (PÚBLICO) ==========
+export const getCategorias = () => api.get("/api/categorias/");
+
+export const getCategoria = (id) => api.get(`/api/categorias/${id}/`);
+
+// ========== PRODUCTOS (PÚBLICO) ==========
 export const getProductos = (params = {}) => api.get("/api/productos/", { params });
 
 export const getProducto = (id) => api.get(`/api/productos/${id}/`);
 
-export const createProducto = (data) => api.post("/api/productos/", data); // Solo admin
+// ========== PRODUCTOS (ADMIN) ==========
+export const createProducto = (data) => api.post("/api/admin/productos/", data); // Solo admin
 
-export const updateProducto = (id, data) => api.put(`/api/productos/${id}/`, data); // Solo admin
+export const updateProducto = (id, data) => api.put(`/api/admin/productos/${id}/`, data); // Solo admin
 
-export const deleteProducto = (id) => api.delete(`/api/productos/${id}/`); // Solo admin
+export const deleteProducto = (id) => api.delete(`/api/admin/productos/${id}/`); // Solo admin
+
+// ========== CATEGORÍAS (ADMIN) ==========
+export const createCategoria = (data) => api.post("/api/admin/categorias/", data); // Solo admin
+
+export const updateCategoria = (id, data) => api.put(`/api/admin/categorias/${id}/`, data); // Solo admin
+
+export const deleteCategoria = (id) => api.delete(`/api/admin/categorias/${id}/`); // Solo admin
 
 export const calificarProducto = (id, calificacion) =>
   api.post(`/api/productos/${id}/calificar/`, { calificacion });
