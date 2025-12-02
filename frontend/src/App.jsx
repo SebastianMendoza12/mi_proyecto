@@ -10,6 +10,7 @@ import Postres from "./pages/Postres";
 import Pizzas from "./pages/Pizzas";
 import Perros from "./pages/Perros";
 import VerifyCode from "./pages/VerifyCode";
+import Acompañantes from "./pages/Acompañantes";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/combos" element={<Combos />} />
         <Route path="/postres" element={<Postres />} />
         <Route path="/pizzas" element={<Pizzas />} />
+        <Route path="/acompañantes" element={<Acompañantes />} />
         <Route path="/perros" element={<Perros />} />
         <Route path="/verify-code" element={<VerifyCode />} />
       </Routes>
