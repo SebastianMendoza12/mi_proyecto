@@ -1,7 +1,8 @@
-// src/services/api.js
+﻿// src/services/api.js
 import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_URL || "https://fastfood-fapu.onrender.com";
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
+console.log("API Base URL:", API_BASE);
 
 const api = axios.create({
   baseURL: API_BASE,
@@ -12,15 +13,15 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // Lista de rutas que NO necesitan token
-    const publicRoutes = ['/api/auth/register/', '/api/login/', '/api/login/'];
+    const publicRoutes = ['/api/auth/register/', '/api/auth/login/', '/api/login/', '/api/productos/', '/api/categorias/'];
     const isPublicRoute = publicRoutes.some(route => config.url?.includes(route));
-    
+
     // Solo agrega el token si NO es una ruta pública
     if (!isPublicRoute) {
       const token = localStorage.getItem("access_token");
       if (token) config.headers.Authorization = `Bearer ${token}`;
     }
-    
+
     return config;
   },
   (error) => Promise.reject(error)
@@ -50,7 +51,7 @@ api.interceptors.response.use(
     const originalRequest = error.config;
     if (!originalRequest) return Promise.reject(error);
     // Lista de rutas públicas que NO deben intentar refrescar token
-    const publicRoutes = ['/api/auth/register/', '/api/auth/login/', '/api/login/'];
+    const publicRoutes = ['/api/auth/register/', '/api/auth/login/', '/api/login/', '/api/productos/', '/api/categorias/'];
     const isPublicRoute = publicRoutes.some(route => originalRequest.url?.includes(route));
 
     // Si es ruta pública, no intentar refrescar token
@@ -102,15 +103,15 @@ api.interceptors.response.use(
   }
 );
 
-// Helpers (endpoints según tu backend)
-export const registerUser = (payload) => api.post("/api/auth/register/", payload);
-export const loginUser = async (payload) => {
-  // La vista TokenObtainPair devuelve { access, refresh }
-  const res = await api.post("/api/auth/login/", payload);
-  if (res.data.access) localStorage.setItem("access_token", res.data.access);
-  if (res.data.refresh) localStorage.setItem("refresh_token", res.data.refresh);
-  return res;
-};
+
+// ========== AUTENTICACIÓN ==========
+export const register = (data) => api.post("/api/usuarios/register/", data);
+
+export const login = (data) => api.post("/api/usuarios/login/", data);
+
+export const adminLogin = (data) => api.post("/api/usuarios/admin-login/", data);
+
+export const verifyCode = (data) => api.post("/api/usuarios/verify-code/", data);
 
 export const logout = () => {
   localStorage.removeItem("access_token");
@@ -118,22 +119,28 @@ export const logout = () => {
   localStorage.removeItem("username");
 };
 
-export const verificarCodigo = (data) => api.post("/api/auth/verificar-codigo/", data);
-
-export const reenviarCodigo = (data) => api.post("/api/auth/reenviar-codigo/", data);
-
-// ========== PRODUCTOS ==========
+// ========== PRODUCTOS (PUBLIC) ==========
 export const getProductos = (params = {}) => api.get("/api/productos/", { params });
 
 export const getProducto = (id) => api.get(`/api/productos/${id}/`);
 
-export const createProducto = (data) => api.post("/api/productos/", data); // Solo admin
-
-export const updateProducto = (id, data) => api.put(`/api/productos/${id}/`, data); // Solo admin
-
-export const deleteProducto = (id) => api.delete(`/api/productos/${id}/`); // Solo admin
-
 export const calificarProducto = (id, calificacion) =>
   api.post(`/api/productos/${id}/calificar/`, { calificacion });
+
+// ========== PRODUCTOS (ADMIN) ==========
+export const getAdminProductos = (params = {}) => api.get("/api/admin/productos/", { params });
+
+export const getAdminProducto = (id) => api.get(`/api/admin/productos/${id}/`);
+
+export const createAdminProducto = (data) => api.post("/api/admin/productos/", data);
+
+export const updateAdminProducto = (id, data) => api.put(`/api/admin/productos/${id}/`, data);
+
+export const deleteAdminProducto = (id) => api.delete(`/api/admin/productos/${id}/`);
+
+// ========== CATEGORIAS ==========
+export const getCategorias = (params = {}) => api.get("/api/categorias/", { params });
+
+export const getCategoria = (id) => api.get(`/api/categorias/${id}/`);
 
 export default api;
