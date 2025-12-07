@@ -24,6 +24,22 @@ class ProductoSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['fecha_creacion', 'fecha_actualizacion']
 
+    def to_representation(self, instance):
+        """Personalizar la representación para devolver URLs absolutas de imágenes"""
+        data = super().to_representation(instance)
+        
+        # Asegurar que la imagen sea una URL absoluta al leer
+        if data.get('imagen'):
+            imagen_url = data['imagen']
+            # Si ya es una URL completa, devolverla tal cual
+            if not (imagen_url.startswith('http://') or imagen_url.startswith('https://')):
+                # Si es una ruta relativa, construir URL absoluta
+                request = self.context.get('request')
+                if request:
+                    data['imagen'] = request.build_absolute_uri(imagen_url)
+        
+        return data
+
     def validate_precio(self, value):
         if value <= 0:
             raise serializers.ValidationError("El precio debe ser mayor a 0")

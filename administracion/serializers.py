@@ -1,16 +1,10 @@
 # administracion/serializers.py
 
 from rest_framework import serializers
-from .models import Producto, Venta, DetalleVenta
+from .models import Venta, DetalleVenta
 from django.contrib.auth import get_user_model
 
 User = get_user_model() 
-
-class ProductoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Producto
-        fields = ['id', 'nombre', 'descripcion', 'precio', 'stock', 'fecha_creacion']
-        read_only_fields = ['id', 'fecha_creacion']
 
 class DetalleVentaSerializer(serializers.ModelSerializer):
     producto_nombre = serializers.ReadOnlyField(source='producto.nombre') 

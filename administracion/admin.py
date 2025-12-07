@@ -1,25 +1,12 @@
 # administracion/admin.py
 
 from django.contrib import admin
-from .models import Producto, Venta, DetalleVenta
+from .models import Venta, DetalleVenta
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth import get_user_model
 
 # Obtiene tu CustomUser
-CustomUser = get_user_model() 
-
-# ----------------------------------------------------
-# 1. Registro de Modelos de Negocio
-# ----------------------------------------------------
-
-# Muestra los campos importantes en la lista de Productos
-@admin.register(Producto)
-class ProductoAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'precio', 'stock', 'fecha_creacion')
-    search_fields = ('nombre', 'descripcion')
-    list_filter = ('stock', 'fecha_creacion')
-    ordering = ('-fecha_creacion',)
-
+CustomUser = get_user_model()
 
 # Para Venta, mostramos una lista de los detalles de la venta
 class DetalleVentaInline(admin.TabularInline):
@@ -30,9 +17,9 @@ class DetalleVentaInline(admin.TabularInline):
 class VentaAdmin(admin.ModelAdmin):
     list_display = ('id', 'usuario', 'fecha_venta', 'total')
     list_filter = ('fecha_venta',)
-    inlines = [DetalleVentaInline] 
+    inlines = [DetalleVentaInline]
     # Dejamos estos como solo lectura, pues ahora se llenan automáticamente
-    readonly_fields = ('total', 'fecha_venta') 
+    readonly_fields = ('total', 'fecha_venta')
     ordering = ('-fecha_venta',)
 
     # Este método se llama después de guardar la Venta y sus Detalles (inlines)
@@ -45,6 +32,7 @@ class VentaAdmin(admin.ModelAdmin):
         # Llamamos a la función de lógica de negocio para calcular el total
         # ¡Esto actualiza y guarda los campos total y fecha_venta!
         venta.calcular_total()
+
 # ----------------------------------------------------
 # 2. Registro de Usuario (OPCIONAL, pero útil)
 # ----------------------------------------------------

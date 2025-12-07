@@ -1,27 +1,24 @@
-from rest_framework import viewsets, filters, status
+from rest_framework import viewsets, filters, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Categoria, Producto
 from .serializers import CategoriaSerializer, ProductoSerializer
 
 
+class IsAdminOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return request.user and request.user.is_staff
+
+
 class CategoriaViewSet(viewsets.ModelViewSet):
     queryset = Categoria.objects.all()
     serializer_class = CategoriaSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly]
     filter_backends = [filters.SearchFilter]
     search_fields = ['nombre', 'descripcion']
-
-    def perform_create(self, serializer):
-        # Solo admins pueden crear
-        if not self.request.user.is_staff:
-            return Response(
-                {'error': 'Solo administradores pueden crear categorías'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        serializer.save()
 
     @action(detail=False, methods=['get'])
     def activas(self, request):
@@ -32,38 +29,14 @@ class CategoriaViewSet(viewsets.ModelViewSet):
 
 
 class ProductoViewSet(viewsets.ModelViewSet):
-    queryset = Producto.objects.select_related('categoria')
+    queryset = Producto.objects.filter(disponible=True).select_related('categoria')
     serializer_class = ProductoSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['categoria', 'disponible', 'precio']
     search_fields = ['nombre', 'descripcion']
     ordering_fields = ['precio', 'calificacion', 'fecha_creacion']
     ordering = ['-fecha_creacion']
-
-    def perform_create(self, serializer):
-        if not self.request.user.is_staff:
-            return Response(
-                {'error': 'Solo administradores pueden crear productos'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        serializer.save()
-
-    def perform_update(self, serializer):
-        if not self.request.user.is_staff:
-            return Response(
-                {'error': 'Solo administradores pueden actualizar productos'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        serializer.save()
-
-    def perform_destroy(self, instance):
-        if not self.request.user.is_staff:
-            return Response(
-                {'error': 'Solo administradores pueden eliminar productos'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        instance.delete()
 
     @action(detail=False, methods=['get'])
     def disponibles(self, request):
@@ -98,7 +71,7 @@ class ProductoViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def calificar(self, request, pk=None):
         """Permite a usuarios calificar un producto (1-5 estrellas)"""
         producto = self.get_object()
