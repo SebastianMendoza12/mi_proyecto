@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { registerUser } from "../services/api"; 
+import { register } from "../services/api";
 import logo from "../assets/LogotipoProyecto.png";
 
 function Register() {
@@ -30,28 +30,28 @@ function Register() {
     if (checks.special) strength++;
 
     if (strength <= 1) {
-      return { 
-        level: 1, 
-        text: "Débil", 
-        color: "text-red-600", 
+      return {
+        level: 1,
+        text: "Débil",
+        color: "text-red-600",
         bgColor: "bg-red-500",
         width: "33%",
         requirements: checks
       };
     } else if (strength <= 3) {
-      return { 
-        level: 2, 
-        text: "Media", 
-        color: "text-yellow-600", 
+      return {
+        level: 2,
+        text: "Media",
+        color: "text-yellow-600",
         bgColor: "bg-yellow-500",
         width: "66%",
         requirements: checks
       };
     } else {
-      return { 
-        level: 3, 
-        text: "Fuerte", 
-        color: "text-green-600", 
+      return {
+        level: 3,
+        text: "Fuerte",
+        color: "text-green-600",
         bgColor: "bg-green-500",
         width: "100%",
         requirements: checks
@@ -66,36 +66,39 @@ function Register() {
   const handleRegister = async (e) => {
     e.preventDefault();
     setMessage(null);
-    if (password !== confirmPassword) {setMessage({ text: "Las contraseñas no coinciden", type: "error" });
+    if (password !== confirmPassword) {
+      setMessage({ text: "Las contraseñas no coinciden", type: "error" });
       return;
     }
-  
+
     setLoading(true);
 
     try {
-      const res = await registerUser({ username, password, email });
-      if (res.data.requiere_verificacion) {
-        navigate("/verify-code", { 
-          state: { 
-            userId: res.data.user_id,
-            email: res.data.email
-          } 
-        });
+      const res = await register({ username, password, email });
+
+      // Store tokens
+      if (res.data.access) {
+        localStorage.setItem("access_token", res.data.access);
+        localStorage.setItem("refresh_token", res.data.refresh);
+        localStorage.setItem("username", res.data.username);
       }
+
+      // Navigate to success page
+      navigate("/register-success");
 
     } catch (err) {
       const status = err.response?.status;
       const errorDetail = err.response?.data?.error || err.message || "";
       let errorText = "Error al registrar usuario";
 
-      if (errorDetail.toLowerCase().includes("already exists") || 
-          errorDetail.toLowerCase().includes("ya existe") ||
-          status === 409) {
+      if (errorDetail.toLowerCase().includes("already exists") ||
+        errorDetail.toLowerCase().includes("ya existe") ||
+        status === 409) {
         errorText = "El usuario ya existe. Elige otro nombre";
       } else if (errorDetail.toLowerCase().includes("email")) {
         errorText = "Email ya registrado";
-      } else if (errorDetail.toLowerCase().includes("password") && 
-                 errorDetail.toLowerCase().includes("débil")) {
+      } else if (errorDetail.toLowerCase().includes("password") &&
+        errorDetail.toLowerCase().includes("débil")) {
         errorText = "La contraseña no cumple los requisitos de seguridad";
       } else if (!err.response) {
         errorText = "Error de conexión. Verifica tu internet";
@@ -111,7 +114,7 @@ function Register() {
 
   return (
     <div className="min-h-screen bg-white flex w-full">
-    
+
       {/* Lado Izquierdo - Logo con fondo crema/beige */}
       <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-12" style={{ backgroundColor: "#FDFED6" }}>
         <div className="flex items-center justify-center w-full h-full">
@@ -123,7 +126,7 @@ function Register() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 bg-white">
         <div className="w-full max-w-md">
           {/* Header */}
-          <div className="text-center"style={{ marginBottom: '3rem' }}>
+          <div className="text-center" style={{ marginBottom: '3rem' }}>
             <h1 className="text-4xl sm:text-5xl font-black text-gray-900">
               REGISTRARSE
             </h1>
@@ -171,7 +174,7 @@ function Register() {
                 <div className="mt-3 space-y-2">
                   {/* Barra de progreso */}
                   <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div 
+                    <div
                       className={`h-full ${passwordStrength.bgColor} transition-all duration-300`}
                       style={{ width: passwordStrength.width }}
                     />
@@ -202,7 +205,7 @@ function Register() {
               {/* ============ FIN BARRA ============ */}
 
             </div>
-            
+
             {/* Confirmar Contraseña */}
             <div style={{ marginBottom: '1.5rem' }}>
               <input
@@ -211,13 +214,12 @@ function Register() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                className={`w-full px-6 py-4 rounded-lg border-2 transition-all duration-200 text-gray-700 placeholder-gray-400 focus:outline-none ${
-                  showPasswordMismatch 
-                    ? "border-red-400 focus:border-red-500" 
-                    : passwordsMatch 
+                className={`w-full px-6 py-4 rounded-lg border-2 transition-all duration-200 text-gray-700 placeholder-gray-400 focus:outline-none ${showPasswordMismatch
+                  ? "border-red-400 focus:border-red-500"
+                  : passwordsMatch
                     ? "border-green-400 focus:border-green-500"
                     : "border-gray-300 focus:border-gray-400"
-                }`}
+                  }`}
               />
               {confirmPassword && (
                 <p className={`mt-2 text-sm font-medium ${passwordsMatch ? "text-green-600" : "text-red-600"}`}>
@@ -241,11 +243,10 @@ function Register() {
             {/* Mensaje de Error/Éxito */}
             {message && (
               <div
-                className={`p-4 rounded-lg border-2 ${
-                  message.type === "error"
-                    ? "bg-red-50 border-red-300 text-red-800"
-                    : "bg-green-50 border-green-300 text-green-800"
-                }`}
+                className={`p-4 rounded-lg border-2 ${message.type === "error"
+                  ? "bg-red-50 border-red-300 text-red-800"
+                  : "bg-green-50 border-green-300 text-green-800"
+                  }`}
               >
                 <p className="text-sm font-medium text-center">
                   {message.text}
