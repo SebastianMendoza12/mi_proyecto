@@ -26,6 +26,7 @@ class CodigoVerificacion(models.Model):
         choices=[('registro', 'Registro'), ('login', 'Login')],
         default='login'
     )
+    session_id = models.CharField(max_length=100, blank=True, null=True)  # Para manejar 2FA sin depender de Django sessions
     
     class Meta:
         ordering = ['-creado_en']

@@ -1,14 +1,13 @@
-from rest_framework.views import APIView
+﻿from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny 
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.utils import timezone
-import re
-import logging
 from .models import CodigoVerificacion
-from .utils import enviar_codigo_email
+from django.utils import timezone
+import logging
+import uuid
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -22,9 +21,6 @@ class RegisterView(APIView):
             password = request.data.get("password")
             email = request.data.get("email")
             
-            logger.info(f"Intento de registro: username={username}, email={email}")
-            
-            # Validaciones básicas
             if not username or not password or not email:
                 return Response(
                     {"error": "Usuario, contraseña y email son requeridos"}, 
@@ -32,63 +28,28 @@ class RegisterView(APIView):
                 )
             
             if User.objects.filter(username=username).exists():
-                return Response(
-                    {"error": "Usuario ya existe"}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                return Response({"error": "Usuario ya existe"}, status=status.HTTP_400_BAD_REQUEST)
             
             if User.objects.filter(email=email).exists():
-                return Response(
-                    {"error": "Email ya registrado"}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                return Response({"error": "Email ya registrado"}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Validación de contraseña
-            password_errors = []
-            if len(password) < 8:
-                password_errors.append("La contraseña debe tener al menos 8 caracteres")
-            if not re.search(r'[A-Z]', password):
-                password_errors.append("Debe contener al menos una letra mayúscula")
-            if not re.search(r'[a-z]', password):
-                password_errors.append("Debe contener al menos una letra minúscula")
-            if not re.search(r'[0-9]', password):
-                password_errors.append("Debe contener al menos un número")
-            if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
-                password_errors.append("Debe contener al menos un carácter especial (!@#$%^&*)")
-            
-            if password_errors:
-                return Response(
-                    {"error": "Contraseña débil: " + ", ".join(password_errors)}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            
-            # Crear usuario
-            logger.info(f"Creando usuario: {username}")
+            # Create user
             user = User.objects.create_user(username=username, password=password, email=email)
-            logger.info(f"Usuario creado exitosamente: {user.id}")
             
-            # Crear código de verificación
-            logger.info(f"Generando código de verificación para: {user.id}")
-            codigo = CodigoVerificacion.objects.create(usuario=user, tipo='registro')
-            logger.info(f"Código generado: {codigo.codigo}")
+            # Auto-verify for now to simplify flow
+            user.verificado_2fa = True
+            user.save()
             
-            # Intentar enviar email
-            try:
-                email_enviado = enviar_codigo_email(email, codigo.codigo)
-                if email_enviado:
-                    logger.info(f"Email enviado exitosamente a: {email}")
-                else:
-                    logger.warning(f"No se pudo enviar email a: {email}, pero continuamos")
-            except Exception as email_error:
-                logger.error(f"Error al enviar email: {str(email_error)}")
-                # No fallar el registro si el email falla
+            # Generate tokens immediately
+            refresh = RefreshToken.for_user(user)
             
             return Response({
-                "message": "Usuario creado. Se ha enviado un código de verificación a tu email",
-                "user_id": user.id,
-                "email": email,
-                "requiere_verificacion": True,
-                "codigo_debug": codigo.codigo if logger.level == logging.DEBUG else None
+                "message": "Usuario creado exitosamente",
+                "access": str(refresh.access_token),
+                "refresh": str(refresh),
+                "username": user.username,
+                "rol": user.rol,
+                "user_id": user.id
             }, status=status.HTTP_201_CREATED)
             
         except Exception as e:
@@ -107,8 +68,6 @@ class LoginView(APIView):
             username = request.data.get("username")
             password = request.data.get("password")
             
-            logger.info(f"Intento de login: username={username}")
-            
             if not username or not password:
                 return Response(
                     {"error": "Usuario y contraseña son requeridos"}, 
@@ -118,52 +77,39 @@ class LoginView(APIView):
             user = authenticate(username=username, password=password)
             
             if not user:
-                logger.warning(f"Credenciales incorrectas para: {username}")
                 return Response(
                     {"error": "Credenciales incorrectas"}, 
                     status=status.HTTP_401_UNAUTHORIZED
                 )
             
-            logger.info(f"Usuario autenticado: {user.id}, verificado_2fa: {user.verificado_2fa}")
+            # Generate 2FA code and session ID
+            session_id = str(uuid.uuid4())
+            codigo_obj = CodigoVerificacion.objects.create(
+                usuario=user,
+                tipo='login',
+                session_id=session_id
+            )
             
-            if not user.verificado_2fa:
-                if not user.email:
-                    return Response(
-                        {"error": "Usuario sin email configurado"}, 
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
-                
-                # Crear código de verificación
-                logger.info(f"Generando código 2FA para: {user.id}")
-                codigo = CodigoVerificacion.objects.create(usuario=user, tipo='login')
-                
-                # Intentar enviar email
-                try:
-                    email_enviado = enviar_codigo_email(user.email, codigo.codigo)
-                    if email_enviado:
-                        logger.info(f"Código 2FA enviado a: {user.email}")
-                    else:
-                        logger.warning(f"No se pudo enviar código 2FA a: {user.email}")
-                except Exception as email_error:
-                    logger.error(f"Error al enviar código 2FA: {str(email_error)}")
-                
-                return Response({
-                    "message": "Se ha enviado un código de verificación a tu email",
-                    "user_id": user.id,
-                    "email": user.email,
-                    "requiere_verificacion": True,
-                    "codigo_debug": codigo.codigo if logger.level == logging.DEBUG else None
-                }, status=status.HTTP_200_OK)
-            
-            # Usuario ya verificado - generar tokens
-            logger.info(f"Generando tokens para usuario verificado: {user.id}")
-            refresh = RefreshToken.for_user(user)
+            # SIMULATED EMAIL - Print to console
+            print("\n" + "="*60)
+            print("SIMULACION DE EMAIL")
+            print("="*60)
+            print(f"Para: {user.email}")
+            print(f"Asunto: Codigo de verificacion - FastFood.exe")
+            print("-"*60)
+            print(f"Hola {user.username},")
+            print(f"\nTu codigo de verificacion es:")
+            print(f"\n    {codigo_obj.codigo}")
+            print(f"\nEste codigo expira en 10 minutos.")
+            print(f"Si no solicitaste este codigo, ignora este mensaje.")
+            print("="*60 + "\n")
             
             return Response({
-                "access": str(refresh.access_token),
-                "refresh": str(refresh),
-                "username": user.username,
-                "rol": user.rol
+                "requires_2fa": True,
+                "session_id": session_id,
+                "message": "Código de verificación enviado. Revisa la consola del servidor.",
+                "email": user.email,  # For demo purposes
+                "debug_code": codigo_obj.codigo # Para facilitar pruebas
             }, status=status.HTTP_200_OK)
             
         except Exception as e:
@@ -174,70 +120,60 @@ class LoginView(APIView):
             )
 
 
-class VerificarCodigoView(APIView):
+class VerifyCodeView(APIView):
     permission_classes = [AllowAny]
     
     def post(self, request):
         try:
-            user_id = request.data.get("user_id")
-            codigo_ingresado = request.data.get("codigo")
+            session_id = request.data.get("session_id")
+            codigo = request.data.get("codigo")
             
-            logger.info(f"Intento de verificación: user_id={user_id}, codigo={codigo_ingresado}")
-            
-            if not user_id or not codigo_ingresado:
+            if not session_id or not codigo:
                 return Response(
-                    {"error": "user_id y código son requeridos"}, 
+                    {"error": "session_id y código son requeridos"}, 
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
+            # Get codigo_obj by session_id
             try:
-                user = User.objects.get(id=user_id)
-            except User.DoesNotExist:
-                logger.warning(f"Usuario no encontrado: {user_id}")
+                codigo_obj = CodigoVerificacion.objects.get(session_id=session_id)
+                user = codigo_obj.usuario
+            except CodigoVerificacion.DoesNotExist:
                 return Response(
-                    {"error": "Usuario no encontrado"}, 
-                    status=status.HTTP_404_NOT_FOUND
-                )
-            
-            codigo = CodigoVerificacion.objects.filter(
-                usuario=user,
-                codigo=codigo_ingresado,
-                usado=False
-            ).first()
-            
-            if not codigo:
-                logger.warning(f"Código inválido para usuario: {user_id}")
-                return Response(
-                    {"error": "Código inválido"}, 
+                    {"error": "Sesión inválida o expirada"}, 
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
-            if not codigo.es_valido():
-                logger.warning(f"Código expirado para usuario: {user_id}")
+            # Verify code
+            if not codigo_obj.es_valido():
                 return Response(
-                    {"error": "Código expirado"}, 
+                    {"error": "Código expirado o ya usado"}, 
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
-            # Marcar código como usado
-            codigo.usado = True
-            codigo.save()
+            if codigo_obj.codigo != codigo:
+                return Response(
+                    {"error": "Código incorrecto"}, 
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
             
-            # Marcar usuario como verificado
-            user.verificado_2fa = True
-            user.save()
+            # Mark code as used
+            codigo_obj.usado = True
+            codigo_obj.save()
             
-            logger.info(f"Usuario verificado exitosamente: {user_id}")
-            
-            # Generar tokens
+            # Generate tokens
             refresh = RefreshToken.for_user(user)
             
+            logger.info(f"Usuario {user.username} verificado con 2FA exitosamente")
+            
             return Response({
-                "message": "Verificación exitosa",
                 "access": str(refresh.access_token),
                 "refresh": str(refresh),
                 "username": user.username,
-                "rol": user.rol
+                "rol": user.rol,
+                "is_staff": user.is_staff,
+                "is_superuser": user.is_superuser,
+                "message": "Verificación exitosa"
             }, status=status.HTTP_200_OK)
             
         except Exception as e:
@@ -247,63 +183,42 @@ class VerificarCodigoView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-
-class ReenviarCodigoView(APIView):
+class AdminLoginView(APIView):
     permission_classes = [AllowAny]
     
     def post(self, request):
         try:
-            user_id = request.data.get("user_id")
+            username = request.data.get("username")
+            password = request.data.get("password")
             
-            logger.info(f"Reenvío de código solicitado para: {user_id}")
-            
-            if not user_id:
+            if not username or not password:
                 return Response(
-                    {"error": "user_id es requerido"}, 
+                    {"error": "Usuario y contraseña son requeridos"}, 
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
-            try:
-                user = User.objects.get(id=user_id)
-            except User.DoesNotExist:
-                logger.warning(f"Usuario no encontrado: {user_id}")
+            user = authenticate(username=username, password=password)
+            
+            if not user:
                 return Response(
-                    {"error": "Usuario no encontrado"}, 
-                    status=status.HTTP_404_NOT_FOUND
+                    {"error": "Credenciales incorrectas"}, 
+                    status=status.HTTP_401_UNAUTHORIZED
                 )
             
-            if not user.email:
-                return Response(
-                    {"error": "Usuario sin email configurado"}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            
-            # Invalidar códigos anteriores
-            CodigoVerificacion.objects.filter(
-                usuario=user,
-                usado=False
-            ).update(usado=True)
-            
-            # Crear nuevo código
-            codigo = CodigoVerificacion.objects.create(usuario=user, tipo='login')
-            
-            # Intentar enviar email
-            try:
-                email_enviado = enviar_codigo_email(user.email, codigo.codigo)
-                if email_enviado:
-                    logger.info(f"Código reenviado a: {user.email}")
-                else:
-                    logger.warning(f"No se pudo reenviar código a: {user.email}")
-            except Exception as email_error:
-                logger.error(f"Error al reenviar código: {str(email_error)}")
+            # Generate tokens directly (NO 2FA for admin)
+            refresh = RefreshToken.for_user(user)
             
             return Response({
-                "message": "Código reenviado exitosamente",
-                "codigo_debug": codigo.codigo if logger.level == logging.DEBUG else None
+                "access": str(refresh.access_token),
+                "refresh": str(refresh),
+                "username": user.username,
+                "rol": user.rol,
+                "is_staff": user.is_staff,
+                "is_superuser": user.is_superuser
             }, status=status.HTTP_200_OK)
             
         except Exception as e:
-            logger.error(f"Error al reenviar código: {str(e)}", exc_info=True)
+            logger.error(f"Error en login admin: {str(e)}", exc_info=True)
             return Response(
                 {"error": f"Error interno del servidor: {str(e)}"}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
