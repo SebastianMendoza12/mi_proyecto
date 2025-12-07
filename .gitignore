@@ -23,3 +23,11 @@ build/
 .vscode/
 .idea/
 *.iml
+
+# --- Archivos de prueba y scripts temporales ---
+test_*.py
+check_*.py
+verify_*.py
+delete_*.py
+reset_*.py
+*.pdf
