@@ -6,7 +6,7 @@ djangorestframework==3.16.1
 djangorestframework_simplejwt==5.5.1
 gunicorn==23.0.0
 packaging==25.0
-psycopg2-binary==2.9.10
+psycopg[binary]==3.2.13
 PyJWT==2.10.1
 python-decouple==3.8
 python-dotenv==1.1.1
@@ -14,4 +14,5 @@ sqlparse==0.5.3
 tzdata==2025.2
 whitenoise==6.11.0
 django-filter==24.3
-Pillow==10.4.0
+Pillow==12.0.0
+

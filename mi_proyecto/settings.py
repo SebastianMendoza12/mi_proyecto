@@ -11,11 +11,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY
 SECRET_KEY = config("SECRET_KEY", default="django-insecure-abc123xyz789-change-this")
-DEBUG = config("DEBUG", default=False, cast=bool)
+DEBUG = True
 
-# ALLOWED_HOSTS - Soporta múltiples hosts separados por coma
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1,fastfood-fapu.onrender.com,mi-proyecto-amber-delta.vercel.app").split(",")
-ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS]  # Limpia espacios
+# ALLOWED_HOSTS
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 INSTALLED_APPS = [
@@ -46,25 +45,8 @@ MIDDLEWARE = [
 ]
 
 # CORS Configuration
-CORS_ALLOWED_ORIGINS = config(
-    "CORS_ALLOWED_ORIGINS",
-    default="http://localhost:5173,http://localhost:3000,https://mi-proyecto-amber-delta.vercel.app"
-).split(",")
-CORS_ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ALLOWED_ORIGINS]  # Limpia espacios
-
-# Configuración adicional de CORS para producción
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-]
 
 ROOT_URLCONF = 'mi_proyecto.urls'
 
@@ -85,11 +67,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'mi_proyecto.wsgi.application'
 
-# Database - Configuración mejorada para Neon
+# Database
 DATABASE_URL = config("DATABASE_URL", default="sqlite:///db.sqlite3")
 
 if DATABASE_URL.startswith("sqlite"):
-    # SQLite (desarrollo local)
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -97,7 +78,6 @@ if DATABASE_URL.startswith("sqlite"):
         }
     }
 else:
-    # PostgreSQL (Neon u otros servicios)
     DATABASES = {
         'default': dj_database_url.config(
             default=DATABASE_URL,
@@ -105,12 +85,9 @@ else:
             conn_health_checks=True,
         )
     }
-    
-    # Configuración SSL para Neon
     if 'OPTIONS' not in DATABASES['default']:
         DATABASES['default']['OPTIONS'] = {}
     DATABASES['default']['OPTIONS']['sslmode'] = 'require'
-    # Limpiar parámetros problemáticos si existen
     DATABASES['default']['OPTIONS'].pop('channel_binding', None)
 
 # Password validation
@@ -170,54 +147,20 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 12,
 }
 
-# Security settings for production
-if not DEBUG:
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    X_FRAME_OPTIONS = 'DENY'
+# Email (Optional for now)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# Configuración de Email
-EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
-EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
-EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
-EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
-EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
-DEFAULT_FROM_EMAIL = config('EMAIL_HOST_USER', default='noreply@fastfood.com')
-
-# Configuración de Logging
+# Logging
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
-            'style': '{',
-        },
-    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
         },
     },
     'root': {
         'handlers': ['console'],
         'level': 'INFO',
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'usuarios': {
-            'handlers': ['console'],
-            'level': 'DEBUG' if DEBUG else 'INFO',
-            'propagate': False,
-        },
     },
 }
